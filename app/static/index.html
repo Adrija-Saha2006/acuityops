@@ -7,287 +7,510 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --blue:       #0047FF;
+      --blue-light: #EEF2FF;
+      --blue-mid:   #3B6FFF;
+      --lime:       #AAFF4D;
+      --lime-dark:  #2D8000;
+      --black:      #0A0A0A;
+      --gray-900:   #111827;
+      --gray-600:   #6B7280;
+      --gray-400:   #9CA3AF;
+      --gray-200:   #E5E7EB;
+      --gray-100:   #F3F4F6;
+      --gray-50:    #FAFAFA;
+      --white:      #FFFFFF;
+      --red:        #DC2626;
+      --shadow-sm:  0 1px 2px rgba(0,0,0,0.05);
+      --shadow:     0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:  0 4px 20px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.04);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Inter', 'Segoe UI', sans-serif;
-      background: #ffffff;
-      color: #0a0a0a;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
     /* ── HEADER ── */
     header {
-      background: #ffffff;
-      border-bottom: 2px solid #0047FF;
-      padding: 0 40px;
-      display: flex;
-      align-items: center;
+      position: sticky; top: 0; z-index: 200;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+      height: 68px;
+      display: flex; align-items: center;
       justify-content: space-between;
-      height: 64px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      padding: 0 40px;
     }
-    .header-left { display: flex; align-items: center; gap: 14px; }
-    .logo-box {
-      width: 34px; height: 34px;
-      border: 2px solid #0047FF;
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .logo-mark {
+      width: 38px; height: 38px;
+      background: var(--blue);
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem; font-weight: 900;
-      color: #0047FF; letter-spacing: -0.5px;
+      font-size: 0.72rem; font-weight: 900;
+      color: var(--white); letter-spacing: -0.3px;
       flex-shrink: 0;
     }
-    header h1 {
-      font-size: 1.05rem; font-weight: 900;
-      color: #0a0a0a; letter-spacing: -0.5px;
+    .header-title {
+      font-size: 1.05rem; font-weight: 800;
+      color: var(--black); letter-spacing: -0.4px;
     }
-    .header-tag {
-      font-size: 0.65rem; font-weight: 700;
-      color: #0047FF; border: 1.5px solid #0047FF;
-      padding: 2px 9px; letter-spacing: 0.1em;
-      text-transform: uppercase;
+    .header-divider {
+      width: 1px; height: 18px;
+      background: var(--gray-200);
     }
-    .header-right {
-      font-size: 0.72rem; color: #999;
-      letter-spacing: 0.05em; font-weight: 500;
+    .header-subtitle {
+      font-size: 0.75rem; font-weight: 500;
+      color: var(--gray-400); letter-spacing: 0.01em;
+    }
+    .header-badge {
+      background: var(--blue-light); color: var(--blue);
+      font-size: 0.68rem; font-weight: 700;
+      padding: 4px 12px; border-radius: 99px;
+      letter-spacing: 0.06em; text-transform: uppercase;
     }
 
-    /* ── DECORATIVE CORNERS ── */
-    .deco { position: fixed; font-size: 1.1rem; color: #ddd;
-            font-weight: 300; pointer-events: none; z-index: 0; line-height: 1; }
-    .deco-tl { top: 76px;  left: 18px;  }
-    .deco-tr { top: 76px;  right: 18px; }
-    .deco-bl { bottom: 28px; left: 18px;  }
-    .deco-br { bottom: 28px; right: 18px; }
-
-    /* ── CONTAINER ── */
-    .container { max-width: 900px; margin: 0 auto; padding: 40px 24px 72px; position: relative; z-index: 1; }
+    /* ── PAGE LAYOUT ── */
+    .page-bg {
+      background:
+        radial-gradient(ellipse 60% 40% at 80% 10%, rgba(0,71,255,0.04) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 35% at 10% 80%, rgba(170,255,77,0.06) 0%, transparent 70%),
+        var(--gray-50);
+      min-height: calc(100vh - 68px);
+      padding: 40px 24px 80px;
+    }
+    .container { max-width: 860px; margin: 0 auto; }
 
     /* ── PIPELINE ── */
+    .pipeline-wrap {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 24px 28px;
+      margin-bottom: 36px;
+    }
+    .pipeline-label {
+      font-size: 0.65rem; font-weight: 800;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--gray-400); margin-bottom: 18px;
+    }
     .pipeline {
-      display: flex;
-      border: 1.5px solid #e0e0e0;
-      margin-bottom: 44px;
-      overflow: hidden;
+      display: flex; align-items: flex-start;
+      position: relative;
+    }
+    .pipeline::before {
+      content: '';
+      position: absolute;
+      top: 18px; left: 18px; right: 18px;
+      height: 2px; background: var(--gray-200);
+      z-index: 0;
     }
     .pipeline-step {
-      flex: 1;
-      text-align: center;
-      padding: 13px 6px 11px;
-      font-size: 0.63rem;
-      font-weight: 800;
-      color: #c0c0c0;
-      border-right: 1.5px solid #e0e0e0;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      transition: background 0.2s, color 0.2s;
+      flex: 1; display: flex;
+      flex-direction: column; align-items: center;
+      gap: 8px; position: relative; z-index: 1;
     }
-    .pipeline-step:last-child { border-right: none; }
-    .pipeline-step .icon { font-size: 0.95rem; display: block; margin-bottom: 5px; }
-    .pipeline-step.active { background: #0047FF; color: #fff; border-color: #0047FF; }
-    .pipeline-step.done   { background: #AAFF4D; color: #0a0a0a; border-color: #AAFF4D; }
-
-    /* ── SECTION LABEL ── */
-    .section-label {
-      font-size: 0.62rem; font-weight: 800;
-      letter-spacing: 0.16em; text-transform: uppercase;
-      color: #bbb; margin-bottom: 18px;
-      display: flex; align-items: center; gap: 12px;
+    .pipe-dot {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--white); border: 2px solid var(--gray-200);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 800;
+      color: var(--gray-400);
+      transition: all 0.3s ease;
     }
-    .section-label::after { content:''; flex:1; height:1px; background:#ebebeb; }
+    .pipe-label {
+      font-size: 0.63rem; font-weight: 600;
+      color: var(--gray-400); text-align: center;
+      letter-spacing: 0.02em; line-height: 1.3;
+    }
+    .pipeline-step.active .pipe-dot {
+      background: var(--blue); border-color: var(--blue);
+      color: var(--white);
+      box-shadow: 0 0 0 4px rgba(0,71,255,0.12);
+    }
+    .pipeline-step.active .pipe-label { color: var(--blue); font-weight: 700; }
+    .pipeline-step.done .pipe-dot {
+      background: var(--lime); border-color: var(--lime);
+      color: var(--black);
+    }
+    .pipeline-step.done .pipe-label { color: var(--lime-dark); font-weight: 700; }
 
     /* ── STEP CARDS ── */
     .step {
-      background: #ffffff;
-      border: 1.5px solid #e8e8e8;
-      border-left: 4px solid #0047FF;
-      padding: 26px 26px 22px;
-      margin-bottom: 18px;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 28px 30px;
+      margin-bottom: 16px;
       position: relative;
+      transition: box-shadow 0.2s, opacity 0.3s;
+      overflow: hidden;
     }
-    .step.disabled { opacity: 0.32; pointer-events: none; }
-    .step::after {
-      content: '+';
-      position: absolute; top: 12px; right: 16px;
-      font-size: 1.1rem; font-weight: 300; color: #d8d8d8; line-height: 1;
+    .step::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--blue), var(--blue-mid));
+    }
+    .step.disabled {
+      opacity: 0.42; pointer-events: none;
+      box-shadow: none;
+    }
+    .step.step-helper::before {
+      background: linear-gradient(90deg, var(--lime), #7DDD00);
+    }
+    .step:not(.disabled):hover {
+      box-shadow: var(--shadow-md);
     }
 
-    .step-num {
-      font-size: 0.62rem; font-weight: 800;
-      letter-spacing: 0.14em; text-transform: uppercase;
-      color: #0047FF; margin-bottom: 5px;
+    .step-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.65rem; font-weight: 800;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--blue); margin-bottom: 8px;
     }
+    .step-tag-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--blue); flex-shrink: 0;
+    }
+    .step.step-helper .step-tag { color: var(--lime-dark); }
+    .step.step-helper .step-tag-dot { background: var(--lime-dark); }
+
     .step h2 {
-      font-size: 1.1rem; font-weight: 900;
-      color: #0a0a0a; margin-bottom: 6px; letter-spacing: -0.3px;
+      font-size: 1.18rem; font-weight: 800;
+      color: var(--black); margin-bottom: 6px;
+      letter-spacing: -0.4px; line-height: 1.2;
     }
-    .step p { font-size: 0.8rem; color: #777; margin-bottom: 18px; line-height: 1.6; }
-
-    .step-helper { border-left-color: #AAFF4D; }
-    .step-helper .step-num { color: #2d8000; }
+    .step p {
+      font-size: 0.82rem; color: var(--gray-600);
+      margin-bottom: 20px; line-height: 1.65;
+      max-width: 580px;
+    }
 
     /* ── LABELS ── */
     label {
-      display: block; font-size: 0.68rem; font-weight: 700;
-      color: #888; margin-bottom: 6px;
-      letter-spacing: 0.08em; text-transform: uppercase;
+      display: block; font-size: 0.7rem; font-weight: 700;
+      color: var(--gray-600); margin-bottom: 7px;
+      letter-spacing: 0.07em; text-transform: uppercase;
     }
 
+    /* ── FILE UPLOAD ZONE ── */
+    .upload-zone {
+      border: 2px dashed var(--gray-200);
+      border-radius: 10px;
+      background: var(--gray-50);
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .upload-zone:hover { border-color: var(--blue); background: var(--blue-light); }
+    .upload-zone input[type=file] {
+      position: absolute; inset: 0;
+      opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-icon { font-size: 1.6rem; margin-bottom: 8px; display: block; }
+    .upload-text {
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--gray-600); margin-bottom: 3px;
+    }
+    .upload-hint { font-size: 0.72rem; color: var(--gray-400); }
+    .upload-zone.has-file {
+      border-color: var(--blue); background: var(--blue-light);
+      border-style: solid;
+    }
+    .upload-zone.has-file .upload-text { color: var(--blue); }
+
     /* ── INPUTS ── */
-    input[type=file],
     textarea,
     input[type=text],
     input[type=number],
     input[type=month],
     select {
       width: 100%;
-      background: #fafafa;
-      border: 1.5px solid #d8d8d8;
-      border-radius: 0;
-      color: #0a0a0a;
-      padding: 10px 13px;
-      font-size: 0.83rem;
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      color: var(--gray-900);
+      padding: 10px 14px;
+      font-size: 0.84rem;
       outline: none;
       font-family: inherit;
-      transition: border-color 0.15s, background 0.15s;
-      appearance: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    input:focus, textarea:focus, select:focus {
-      border-color: #0047FF; background: #fff;
+    textarea:focus,
+    input:focus,
+    select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0,71,255,0.08);
     }
-    textarea { resize: vertical; min-height: 110px; font-family: monospace; font-size: 0.78rem; }
-    input[type=file] { cursor: pointer; }
-    select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 32px; }
+    textarea {
+      resize: vertical; min-height: 110px;
+      font-family: 'Menlo', 'Consolas', monospace;
+      font-size: 0.77rem; line-height: 1.6;
+    }
+    select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M0 0l6 7 6-7z' fill='%239CA3AF'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px; appearance: none;
+    }
 
     /* ── GENERATOR GRID ── */
-    .gen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .gen-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; margin-bottom: 16px;
+    }
 
     /* ── GEN PREVIEW ── */
     #gen-preview {
-      background: #f5f5f5; border: 1.5px solid #e0e0e0;
-      padding: 12px 14px; font-size: 0.78rem;
-      color: #777; font-family: monospace; line-height: 1.7;
-      margin-bottom: 2px;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 0.78rem; color: var(--gray-600);
+      font-family: 'Menlo', 'Consolas', monospace;
+      line-height: 1.8; margin-bottom: 4px;
     }
 
     /* ── BUTTONS ── */
     .btn {
-      display: inline-block; padding: 11px 26px;
-      font-size: 0.75rem; font-weight: 800;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 24px;
+      font-size: 0.78rem; font-weight: 700;
       cursor: pointer; border: none;
-      transition: opacity 0.15s, transform 0.1s;
-      margin-top: 14px; letter-spacing: 0.08em;
-      text-transform: uppercase; border-radius: 0;
+      border-radius: 8px;
+      transition: all 0.15s;
+      margin-top: 14px;
+      letter-spacing: 0.04em; text-transform: uppercase;
       font-family: inherit;
     }
-    .btn:hover  { opacity: 0.82; transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
-    .btn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
-    .btn-primary { background: #0047FF; color: #fff; }
-    .btn-success { background: #AAFF4D; color: #0a0a0a; }
-    .btn-danger  { background: #0a0a0a; color: #fff; }
-    .btn-helper  { background: #AAFF4D; color: #0a0a0a; }
+    .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .btn:active { transform: translateY(0); box-shadow: none; }
+    .btn:disabled {
+      opacity: 0.35; cursor: not-allowed;
+      transform: none; box-shadow: none;
+    }
+    .btn-primary { background: var(--blue); color: var(--white); }
+    .btn-primary:hover { background: var(--blue-mid); }
+    .btn-success { background: var(--lime); color: var(--black); }
+    .btn-success:hover { background: #BFFF6A; }
+    .btn-danger  { background: var(--black); color: var(--white); }
+    .btn-danger:hover  { background: #222; }
+    .btn-helper  { background: var(--lime); color: var(--black); }
+
+    .btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
 
     /* ── RESULT BOXES ── */
     .result {
-      margin-top: 14px; background: #f5f5f5;
-      border: 1.5px solid #e0e0e0;
-      padding: 13px; font-size: 0.78rem;
-      font-family: monospace; white-space: pre-wrap;
-      max-height: 220px; overflow-y: auto; display: none;
-      line-height: 1.6;
+      margin-top: 14px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 0.78rem;
+      font-family: 'Menlo', 'Consolas', monospace;
+      white-space: pre-wrap; max-height: 200px;
+      overflow-y: auto; display: none;
+      line-height: 1.7;
     }
 
     /* ── VIOLATION CARDS ── */
+    .violations-header {
+      font-size: 0.68rem; font-weight: 800;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gray-400); margin-bottom: 12px;
+      padding-bottom: 8px; border-bottom: 1px solid var(--gray-200);
+    }
     .violation-card {
-      background: #fff;
-      border: 1.5px solid #e8e8e8;
-      border-left: 4px solid #0047FF;
-      padding: 14px 18px; margin-bottom: 10px;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 10px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: start; gap: 14px;
     }
-    .violation-card .name {
-      font-weight: 900; color: #0047FF;
-      font-size: 0.82rem; letter-spacing: 0.07em; text-transform: uppercase;
+    .v-indicator {
+      width: 4px; height: 100%; min-height: 48px;
+      background: var(--blue); border-radius: 2px;
+      flex-shrink: 0; align-self: stretch;
     }
-    .violation-card .detail { color: #777; font-size: 0.77rem; margin-top: 5px; line-height: 1.5; }
-    .violation-card .penalty {
-      display: inline-block; margin-top: 9px;
-      background: #AAFF4D; color: #0a0a0a;
-      font-size: 0.78rem; font-weight: 800;
-      padding: 3px 10px; letter-spacing: 0.04em;
+    .v-body { display: flex; flex-direction: column; gap: 4px; }
+    .v-name {
+      font-size: 0.8rem; font-weight: 800;
+      color: var(--black); letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .v-detail { font-size: 0.75rem; color: var(--gray-600); line-height: 1.5; }
+    .v-penalty {
+      background: var(--lime); color: var(--black);
+      font-size: 0.72rem; font-weight: 800;
+      padding: 5px 12px; border-radius: 6px;
+      white-space: nowrap; align-self: center;
+      letter-spacing: 0.02em;
     }
 
     /* ── DISPUTE BOX ── */
-    .dispute-box {
-      background: #f0f5ff;
-      border: 1.5px solid #0047FF33;
-      border-left: 4px solid #0047FF;
-      padding: 14px; font-size: 0.76rem;
-      font-family: monospace; white-space: pre-wrap;
-      max-height: 200px; overflow-y: auto;
-      margin-top: 10px; color: #0a3080; line-height: 1.6;
+    .dispute-wrap {
+      margin-top: 16px;
+      border: 1px solid var(--gray-200);
+      border-radius: 10px; overflow: hidden;
+    }
+    .dispute-header {
+      background: var(--blue);
+      padding: 10px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .dispute-header span {
+      font-size: 0.72rem; font-weight: 700;
+      color: var(--white); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .dispute-doc-badge {
+      font-size: 0.65rem; font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.1);
+      padding: 2px 8px; border-radius: 4px;
+    }
+    .dispute-body {
+      background: #F8FAFF;
+      padding: 16px;
+      font-size: 0.76rem;
+      font-family: 'Menlo', 'Consolas', monospace;
+      white-space: pre-wrap;
+      max-height: 220px; overflow-y: auto;
+      color: #1E3A8A; line-height: 1.7;
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      display: flex; align-items: center; gap: 14px;
+      margin: 28px 0 20px;
+    }
+    .section-divider span {
+      font-size: 0.63rem; font-weight: 800;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--gray-400); white-space: nowrap;
+    }
+    .section-divider::before,
+    .section-divider::after {
+      content: ''; flex: 1; height: 1px;
+      background: var(--gray-200);
     }
 
     /* ── TOAST ── */
     #toast {
       position: fixed; bottom: 28px; right: 28px;
-      background: #0a0a0a; border-left: 4px solid #0047FF;
-      padding: 12px 20px; font-size: 0.78rem;
-      font-weight: 700; color: #fff;
-      transform: translateY(80px); opacity: 0;
-      transition: all 0.25s; z-index: 999;
-      letter-spacing: 0.04em; font-family: inherit;
+      background: var(--black);
+      border-radius: 10px;
+      padding: 13px 20px;
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--white);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      transform: translateY(80px) scale(0.95);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(.34,1.56,.64,1);
+      z-index: 999; letter-spacing: 0.02em;
+      display: flex; align-items: center; gap: 10px;
     }
-    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast::before {
+      content: ''; width: 6px; height: 6px;
+      border-radius: 50%; background: var(--lime);
+      flex-shrink: 0;
+    }
+    #toast.show { transform: translateY(0) scale(1); opacity: 1; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeInUp 0.3s ease forwards; }
+
+    @keyframes pulse-ring {
+      0%   { box-shadow: 0 0 0 0 rgba(0,71,255,0.3); }
+      70%  { box-shadow: 0 0 0 8px rgba(0,71,255,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,71,255,0); }
+    }
+    .pipeline-step.active .pipe-dot { animation: pulse-ring 2s infinite; }
   </style>
 </head>
 <body>
 
-<!-- Decorative corner crosses -->
-<span class="deco deco-tl">+</span>
-<span class="deco deco-tr">+</span>
-<span class="deco deco-bl">+</span>
-<span class="deco deco-br">+</span>
-
 <header>
   <div class="header-left">
-    <div class="logo-box">AO</div>
-    <h1>AcuityOps</h1>
-    <span class="header-tag">Compliance Agent</span>
+    <div class="logo-mark">AO</div>
+    <span class="header-title">AcuityOps</span>
+    <div class="header-divider"></div>
+    <span class="header-subtitle">Vendor Compliance Agent</span>
   </div>
-  <div class="header-right">Vendor SLA Audit System</div>
+  <div class="header-badge">AI-Powered Audit</div>
 </header>
 
+<div class="page-bg">
 <div class="container">
 
-  <!-- Pipeline tracker -->
-  <div class="pipeline">
-    <div class="pipeline-step" id="pipe-upload"><span class="icon">📄</span>Upload Contract</div>
-    <div class="pipeline-step" id="pipe-audit"><span class="icon">🔍</span>Run Audit</div>
-    <div class="pipeline-step" id="pipe-gather"><span class="icon">🤖</span>Auto-Gather</div>
-    <div class="pipeline-step" id="pipe-dispute"><span class="icon">📝</span>Draft Dispute</div>
-    <div class="pipeline-step" id="pipe-approve"><span class="icon">✅</span>Human Approval</div>
+  <!-- Pipeline -->
+  <div class="pipeline-wrap">
+    <div class="pipeline-label">Audit Pipeline</div>
+    <div class="pipeline">
+      <div class="pipeline-step" id="pipe-upload">
+        <div class="pipe-dot">01</div>
+        <div class="pipe-label">Upload<br>Contract</div>
+      </div>
+      <div class="pipeline-step" id="pipe-audit">
+        <div class="pipe-dot">02</div>
+        <div class="pipe-label">Run<br>Audit</div>
+      </div>
+      <div class="pipeline-step" id="pipe-gather">
+        <div class="pipe-dot">03</div>
+        <div class="pipe-label">Auto<br>Gather</div>
+      </div>
+      <div class="pipeline-step" id="pipe-dispute">
+        <div class="pipe-dot">04</div>
+        <div class="pipe-label">Draft<br>Dispute</div>
+      </div>
+      <div class="pipeline-step" id="pipe-approve">
+        <div class="pipe-dot">05</div>
+        <div class="pipe-label">Human<br>Approval</div>
+      </div>
+    </div>
   </div>
-
-  <div class="section-label">Workflow</div>
 
   <!-- Step 1: Upload Contract -->
   <div class="step" id="step-upload">
-    <div class="step-num">Step 01</div>
+    <div class="step-tag"><span class="step-tag-dot"></span>Step 01</div>
     <h2>Upload Contract</h2>
-    <p>Upload your vendor SLA (.txt or .pdf). The system extracts every enforceable rule.</p>
+    <p>Upload your vendor SLA (.txt or .pdf). The AI reads every clause and extracts enforceable rules with thresholds and penalties.</p>
     <label>Contract file</label>
-    <input type="file" id="contractFile" accept=".txt,.pdf" />
-    <button class="btn btn-primary" onclick="uploadContract()">Extract Rules</button>
+    <div class="upload-zone" id="zone-contract">
+      <input type="file" id="contractFile" accept=".txt,.pdf" onchange="markZone('zone-contract', this)" />
+      <span class="upload-icon">📄</span>
+      <div class="upload-text">Drop your SLA here or click to browse</div>
+      <div class="upload-hint">Supports .txt and .pdf</div>
+    </div>
+    <button class="btn btn-primary" onclick="uploadContract()">&#8594; Extract Rules</button>
     <div class="result" id="uploadResult"></div>
   </div>
 
+  <div class="section-divider"><span>Optional Helper</span></div>
+
   <!-- Helper: Log Generator -->
   <div class="step step-helper disabled" id="step-generator">
-    <div class="step-num">Helper</div>
+    <div class="step-tag"><span class="step-tag-dot"></span>Helper Tool</div>
     <h2>Log Generator</h2>
-    <p>Don't have a log file? Enter the incident details and we'll compute the uptime and write the JSON for you.</p>
+    <p>No log file? Enter the incident details and the system calculates the exact uptime percentage and generates the JSON automatically.</p>
     <div class="gen-grid">
       <div>
         <label>Metric name</label>
@@ -315,7 +538,7 @@
         </select>
       </div>
       <div>
-        <label>Custom metric name (if selected above)</label>
+        <label>Custom metric name</label>
         <input type="text" id="gen-custom-metric" placeholder="e.g. api_uptime" style="opacity:0.4" disabled />
       </div>
       <div>
@@ -328,36 +551,44 @@
       </div>
     </div>
     <div id="gen-preview">Fill in the fields above and click Generate.</div>
-    <button class="btn btn-helper" onclick="generateLog()">Generate Log JSON</button>
+    <button class="btn btn-helper" onclick="generateLog()">&#8635; Generate Log JSON</button>
   </div>
+
+  <div class="section-divider"><span>Audit</span></div>
 
   <!-- Step 2: Upload Logs -->
   <div class="step disabled" id="step-audit">
-    <div class="step-num">Step 02</div>
+    <div class="step-tag"><span class="step-tag-dot"></span>Step 02</div>
     <h2>Upload Vendor Logs</h2>
-    <p>Upload the vendor's operational log file (.json). Missing metrics are fetched automatically by the agent.</p>
+    <p>Upload the vendor's operational log file (.json). Any missing metrics required by the contract are fetched automatically by the AI agent.</p>
     <label>Vendor log file (.json)</label>
-    <input type="file" id="logsFile" accept=".json" onchange="loadLogsFile(this)" />
-    <label style="margin-top:14px;">Loaded metrics — review before running</label>
-    <textarea id="logsInput" placeholder="Upload a .json log file above to populate this field..."></textarea>
-    <button class="btn btn-primary" onclick="runAudit()" id="auditBtn" disabled>Run Audit</button>
+    <div class="upload-zone" id="zone-logs">
+      <input type="file" id="logsFile" accept=".json" onchange="loadLogsFile(this)" />
+      <span class="upload-icon">📊</span>
+      <div class="upload-text">Drop your log file here or click to browse</div>
+      <div class="upload-hint">JSON format — or use the Log Generator above</div>
+    </div>
+    <label style="margin-top:16px;">Loaded metrics — review before running</label>
+    <textarea id="logsInput" placeholder="Upload a .json log file above, or use the Log Generator..."></textarea>
+    <button class="btn btn-primary" onclick="runAudit()" id="auditBtn" disabled>&#8594; Run Audit</button>
     <div class="result" id="auditResult"></div>
   </div>
 
   <!-- Step 3: Review & Approve -->
   <div class="step disabled" id="step-approve">
-    <div class="step-num">Step 03</div>
+    <div class="step-tag"><span class="step-tag-dot"></span>Step 03</div>
     <h2>Review &amp; Approve</h2>
-    <p>The agent paused for human review. Inspect the violations and the drafted dispute letter, then decide.</p>
+    <p>The agent has paused for human review. Inspect each violation and the drafted dispute letter, then make your decision.</p>
     <div id="violationsList"></div>
     <div id="disputeBox"></div>
-    <div style="display:flex; gap:10px; margin-top:18px; flex-wrap:wrap;">
-      <button class="btn btn-success" onclick="decide('approve')">Approve &amp; Send Dispute</button>
-      <button class="btn btn-danger"  onclick="decide('reject')">Reject</button>
+    <div class="btn-row">
+      <button class="btn btn-success" onclick="decide('approve')">&#10003; Approve &amp; Send Dispute</button>
+      <button class="btn btn-danger"  onclick="decide('reject')">&#10005; Reject</button>
     </div>
     <div class="result" id="approveResult"></div>
   </div>
 
+</div>
 </div>
 
 <div id="toast"></div>
@@ -366,32 +597,46 @@
   let contractId = null;
   let taskId     = null;
 
+  function markZone(id, input) {
+    const zone = document.getElementById(id);
+    if (input.files && input.files[0]) {
+      zone.classList.add('has-file');
+      zone.querySelector('.upload-text').textContent = input.files[0].name;
+      zone.querySelector('.upload-hint').textContent = 'File selected — ready to submit';
+    }
+  }
+
   function toast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg;
+    t.childNodes[t.childNodes.length-1] && t.childNodes[t.childNodes.length-1].nodeType === 3
+      ? t.childNodes[t.childNodes.length-1].textContent = msg
+      : t.append(document.createTextNode(msg));
+    t.lastChild.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
   }
 
   function setPipe(step) {
     const steps = ['upload','audit','gather','dispute','approve'];
+    const idx   = steps.indexOf(step);
     steps.forEach((s, i) => {
       const el = document.getElementById('pipe-' + s);
       el.classList.remove('active','done');
-      const idx = steps.indexOf(step);
       if (i < idx) el.classList.add('done');
       else if (i === idx) el.classList.add('active');
     });
   }
 
-  function showResult(id, text, color) {
+  function showResult(id, text, type) {
     const el = document.getElementById(id);
     el.style.display = 'block';
-    el.style.color = color || '#555';
+    el.classList.add('fade-in');
+    const colors = { success:'#166534', error:'#991B1B', info:'#1E3A8A', warn:'#92400E' };
+    el.style.color = colors[type] || '#374151';
+    el.style.background = type === 'success' ? '#F0FDF4' : type === 'error' ? '#FEF2F2' : type === 'info' ? '#EFF6FF' : '#FAFAFA';
     el.textContent = text;
   }
 
-  // Toggle custom metric input
   document.getElementById('gen-metric').addEventListener('change', function() {
     const custom = document.getElementById('gen-custom-metric');
     if (this.value === 'custom') { custom.disabled = false; custom.style.opacity = '1'; }
@@ -415,18 +660,16 @@
     const daysInMonth   = new Date(year, month, 0).getDate();
     const totalMinutes  = daysInMonth * 24 * 60;
     const downMinutes   = Math.round(hours * 60);
-    const uptimeMinutes = totalMinutes - downMinutes;
-    const uptimePct     = parseFloat(((uptimeMinutes / totalMinutes) * 100).toFixed(4));
-
-    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const label = `${monthNames[month-1]} ${year}`;
+    const uptimePct     = parseFloat((((totalMinutes - downMinutes) / totalMinutes) * 100).toFixed(4));
+    const monthNames    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const label         = `${monthNames[month-1]} ${year}`;
 
     document.getElementById('gen-preview').innerHTML =
-      `<span style="color:#2d8000;font-weight:700">Calculation:</span>\n` +
-      `  ${daysInMonth} days in ${label} = ${totalMinutes.toLocaleString()} total minutes\n` +
-      `  ${hours}h downtime = ${downMinutes} minutes unavailable\n` +
-      `  Uptime = (${totalMinutes.toLocaleString()} - ${downMinutes}) / ${totalMinutes.toLocaleString()} x 100\n` +
-      `  = <span style="color:#0047FF;font-weight:900">${uptimePct}%</span>`;
+      `<span style="color:var(--lime-dark);font-weight:700">Calculation</span>\n` +
+      `  ${daysInMonth} days × 24h × 60m  =  ${totalMinutes.toLocaleString()} total minutes\n` +
+      `  ${hours}h downtime               =  ${downMinutes} minutes unavailable\n` +
+      `  (${totalMinutes.toLocaleString()} − ${downMinutes}) ÷ ${totalMinutes.toLocaleString()} × 100\n` +
+      `  = <span style="color:var(--blue);font-weight:900;font-size:0.9rem">${uptimePct}%</span>  for ${label}`;
 
     const log = [{ metric, value: uptimePct, unit: "percent", period: monthVal,
                    notes: `${hours}h downtime in ${label} (${downMinutes}/${totalMinutes} min unavailable)` }];
@@ -439,6 +682,7 @@
     const file = input.files[0];
     if (!file) return;
     if (!file.name.endsWith('.json')) { toast('Please upload a .json file'); return; }
+    markZone('zone-logs', input);
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
@@ -447,7 +691,7 @@
         document.getElementById('auditBtn').disabled = false;
         toast(`Loaded ${parsed.length} metric(s) from ${file.name}`);
       } catch(err) {
-        toast('Invalid JSON in log file: ' + err.message);
+        toast('Invalid JSON: ' + err.message);
       }
     };
     reader.readAsText(file);
@@ -455,30 +699,27 @@
 
   async function uploadContract() {
     const file = document.getElementById('contractFile').files[0];
-    if (!file) { toast('Select a file first'); return; }
-
+    if (!file) { toast('Select a contract file first'); return; }
     const form = new FormData();
     form.append('file', file);
     setPipe('upload');
-
     try {
       const res  = await fetch('/upload-contract/', { method: 'POST', body: form });
       const data = await res.json();
-      if (!res.ok) { showResult('uploadResult', 'Error: ' + (data.detail || res.status), '#cc0000'); return; }
+      if (!res.ok) { showResult('uploadResult', 'Error: ' + (data.detail || res.status), 'error'); return; }
 
       contractId = data.contract_id;
-      const lines = [`Contract uploaded successfully`, `Rules extracted: ${data.rules_extracted}`, ``];
-      data.rules.forEach(r => {
-        lines.push(`  ${r.metric_name}: ${r.operator} ${r.threshold} ${r.unit}  |  credit: ${r.penalty_amount} ${r.penalty_unit || ''}`);
+      const lines = [`Contract uploaded — ${data.rules_extracted} enforceable rule(s) extracted\n`];
+      data.rules.forEach((r, i) => {
+        lines.push(`  ${i+1}. ${r.metric_name}: ${r.operator} ${r.threshold} ${r.unit}   |   credit: ${r.penalty_amount} ${r.penalty_unit || ''}`);
       });
-      showResult('uploadResult', lines.join('\n'), '#2d8000');
-
+      showResult('uploadResult', lines.join('\n'), 'success');
       document.getElementById('step-generator').classList.remove('disabled');
       document.getElementById('step-audit').classList.remove('disabled');
       setPipe('audit');
       toast('Contract parsed — ' + data.rules_extracted + ' rules found');
     } catch(e) {
-      showResult('uploadResult', 'Network error: ' + e.message, '#cc0000');
+      showResult('uploadResult', 'Network error: ' + e.message, 'error');
     }
   }
 
@@ -488,6 +729,8 @@
     try { logs = JSON.parse(document.getElementById('logsInput').value); }
     catch(e) { toast('Invalid JSON in logs'); return; }
 
+    const btn = document.getElementById('auditBtn');
+    btn.textContent = 'Running...'; btn.disabled = true;
     setPipe('gather');
     document.getElementById('auditResult').style.display = 'none';
 
@@ -498,48 +741,61 @@
         body: JSON.stringify({ contract_id: contractId, operational_logs: logs })
       });
       const data = await res.json();
-      if (!res.ok) { showResult('auditResult', 'Error: ' + (data.detail || res.status), '#cc0000'); return; }
+      btn.textContent = '→ Run Audit'; btn.disabled = false;
+      if (!res.ok) { showResult('auditResult', 'Error: ' + (data.detail || res.status), 'error'); return; }
 
       taskId = data.task_id;
 
       if (data.status === 'pending_approval') {
         setPipe('dispute');
         showResult('auditResult',
-          `Audit complete. ${data.violations.length} violation(s) found.\nGraph paused — awaiting your decision.`,
-          '#0047FF'
-        );
+          `Audit complete. ${data.violations.length} violation(s) detected.\nGraph paused — agent is waiting for your decision.`,
+          'info');
 
         const vList = document.getElementById('violationsList');
-        vList.innerHTML = data.violations.map(v => `
-          <div class="violation-card">
-            <div class="name">${v.metric_name.toUpperCase().replace(/_/g,' ')}</div>
-            <div class="detail">
-              Required: ${v.expected}&nbsp;&nbsp;|&nbsp;&nbsp;Actual: ${v.actual} ${v.unit}&nbsp;&nbsp;|&nbsp;&nbsp;Deviation: ${v.breach_magnitude} ${v.unit}
-            </div>
-            <div class="penalty">${v.penalty_label || 'Penalty: ' + v.estimated_penalty}</div>
-          </div>`).join('');
+        if (data.violations.length) {
+          vList.innerHTML = `<div class="violations-header">${data.violations.length} Violation(s) Detected</div>` +
+            data.violations.map(v => `
+            <div class="violation-card fade-in">
+              <div class="v-indicator"></div>
+              <div class="v-body">
+                <div class="v-name">${v.metric_name.replace(/_/g,' ')}</div>
+                <div class="v-detail">
+                  Required: <strong>${v.expected}</strong> &nbsp;&nbsp;·&nbsp;&nbsp;
+                  Actual: <strong>${v.actual} ${v.unit}</strong> &nbsp;&nbsp;·&nbsp;&nbsp;
+                  Deviation: <strong>${v.breach_magnitude} ${v.unit}</strong>
+                </div>
+              </div>
+              <div class="v-penalty">${v.penalty_label || '$' + v.estimated_penalty}</div>
+            </div>`).join('');
+        }
 
         if (data.dispute_letter) {
-          document.getElementById('disputeBox').innerHTML =
-            '<label style="margin-top:14px;display:block">Drafted Dispute Letter</label>' +
-            '<div class="dispute-box">' + data.dispute_letter + '</div>';
+          document.getElementById('disputeBox').innerHTML = `
+            <div class="dispute-wrap fade-in">
+              <div class="dispute-header">
+                <span>Drafted Dispute Letter</span>
+                <span class="dispute-doc-badge">Ready to Send</span>
+              </div>
+              <div class="dispute-body">${data.dispute_letter}</div>
+            </div>`;
         }
 
         document.getElementById('step-approve').classList.remove('disabled');
         setPipe('approve');
-        toast('Agent paused — review and approve');
+        toast('Agent paused — review and decide');
       } else {
         setPipe('approve');
-        showResult('auditResult', `Status: ${data.status}\nNo violations found.`, '#2d8000');
+        showResult('auditResult', `Status: ${data.status}\nNo violations found — vendor is compliant.`, 'success');
       }
     } catch(e) {
-      showResult('auditResult', 'Network error: ' + e.message, '#cc0000');
+      btn.textContent = '→ Run Audit'; btn.disabled = false;
+      showResult('auditResult', 'Network error: ' + e.message, 'error');
     }
   }
 
   async function decide(decision) {
     if (!taskId) { toast('No active task'); return; }
-
     try {
       const res  = await fetch(`/tasks/${taskId}/approve`, {
         method: 'POST',
@@ -547,21 +803,21 @@
         body: JSON.stringify({ decision })
       });
       const data = await res.json();
-      if (!res.ok) { showResult('approveResult', 'Error: ' + (data.detail || res.status), '#cc0000'); return; }
+      if (!res.ok) { showResult('approveResult', 'Error: ' + (data.detail || res.status), 'error'); return; }
 
-      const color = decision === 'approve' ? '#2d8000' : '#cc0000';
       showResult('approveResult',
-        `Decision: ${decision.toUpperCase()}\nFinal status: ${data.final_status}`,
-        color
-      );
+        `Decision: ${decision.toUpperCase()}\nFinal status: ${data.final_status}\nHuman decision recorded: ${data.human_decision}`,
+        decision === 'approve' ? 'success' : 'error');
 
       document.getElementById('step-approve').querySelectorAll('.btn').forEach(b => b.disabled = true);
-      setPipe('approve');
       toast(decision === 'approve' ? 'Dispute approved and sent!' : 'Dispute rejected.');
     } catch(e) {
-      showResult('approveResult', 'Network error: ' + e.message, '#cc0000');
+      showResult('approveResult', 'Network error: ' + e.message, 'error');
     }
   }
+
+  // Init toast text node
+  document.getElementById('toast').appendChild(document.createTextNode(''));
 </script>
 </body>
 </html>
