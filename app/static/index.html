@@ -40,41 +40,65 @@
     /* ── HEADER ── */
     header {
       position: sticky; top: 0; z-index: 200;
-      background: var(--white);
-      border-bottom: 1px solid var(--gray-200);
-      box-shadow: var(--shadow-sm);
-      height: 68px;
+      background: #FAF6F2;
+      border-bottom: 1px solid #EDE8E2;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      height: 66px;
       display: flex; align-items: center;
       justify-content: space-between;
-      padding: 0 40px;
+      padding: 0 36px;
     }
-    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-left { display: flex; align-items: center; gap: 36px; }
+
+    /* Logo */
+    .logo-area { display: flex; align-items: center; gap: 10px; text-decoration: none; }
     .logo-mark {
-      width: 38px; height: 38px;
-      background: var(--blue);
+      width: 34px; height: 34px; position: relative; flex-shrink: 0;
+    }
+    .logo-mark svg { width: 34px; height: 34px; }
+    .logo-text {
+      font-size: 1.1rem; font-weight: 800;
+      color: #1A1A1A; letter-spacing: -0.5px;
+    }
+
+    /* Nav links */
+    .header-nav { display: flex; align-items: center; gap: 4px; }
+    .header-nav a {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.82rem; font-weight: 500; color: #3D3D3D;
+      text-decoration: none; padding: 6px 12px; border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .header-nav a:hover { background: rgba(0,0,0,0.05); color: #000; }
+    .nav-chevron {
+      font-size: 0.6rem; color: #888; margin-top: 1px;
+      display: inline-block;
+    }
+
+    /* Right side */
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .header-search {
+      width: 38px; height: 38px; border: none;
+      background: transparent; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.72rem; font-weight: 900;
-      color: var(--white); letter-spacing: -0.3px;
-      flex-shrink: 0;
+      border-radius: 6px; transition: background 0.15s;
+      color: #555; font-size: 1rem;
     }
-    .header-title {
-      font-size: 1.05rem; font-weight: 800;
-      color: var(--black); letter-spacing: -0.4px;
+    .header-search:hover { background: rgba(0,0,0,0.06); }
+    .header-cta {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #1A1A1A; color: #fff;
+      font-size: 0.78rem; font-weight: 700;
+      padding: 9px 20px; border: none; border-radius: 6px;
+      cursor: pointer; letter-spacing: 0.02em;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
     }
-    .header-divider {
-      width: 1px; height: 18px;
-      background: var(--gray-200);
-    }
-    .header-subtitle {
-      font-size: 0.75rem; font-weight: 500;
-      color: var(--gray-400); letter-spacing: 0.01em;
-    }
-    .header-badge {
-      background: var(--blue-light); color: var(--blue);
-      font-size: 0.68rem; font-weight: 700;
-      padding: 4px 12px; border-radius: 99px;
-      letter-spacing: 0.06em; text-transform: uppercase;
-    }
+    .header-cta:hover { background: #333; transform: translateY(-1px); }
+    .header-cta:active { transform: translateY(0); }
+    .cta-arrow { font-size: 0.85rem; }
 
     /* ── PAGE LAYOUT ── */
     .page-bg {
@@ -450,12 +474,40 @@
 
 <header>
   <div class="header-left">
-    <div class="logo-mark">AO</div>
-    <span class="header-title">AcuityOps</span>
-    <div class="header-divider"></div>
-    <span class="header-subtitle">Vendor Compliance Agent</span>
+    <!-- Logo -->
+    <a class="logo-area" href="#">
+      <div class="logo-mark">
+        <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="4" width="18" height="22" rx="2" fill="#8B1A1A" opacity="0.2"/>
+          <rect x="5" y="7" width="18" height="22" rx="2" fill="#8B1A1A" opacity="0.5"/>
+          <rect x="2" y="10" width="18" height="22" rx="2" fill="#8B1A1A"/>
+          <line x1="6" y1="16" x2="16" y2="16" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="6" y1="20" x2="14" y2="20" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="6" y1="24" x2="12" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="logo-text">AcuityOps</span>
+    </a>
+    <!-- Nav -->
+    <nav class="header-nav">
+      <a href="#">Features <span class="nav-chevron">&#8964;</span></a>
+      <a href="#">Contracts <span class="nav-chevron">&#8964;</span></a>
+      <a href="#">Reports <span class="nav-chevron">&#8964;</span></a>
+      <a href="#">Resources <span class="nav-chevron">&#8964;</span></a>
+      <a href="#">Company <span class="nav-chevron">&#8964;</span></a>
+    </nav>
   </div>
-  <div class="header-badge">AI-Powered Audit</div>
+  <div class="header-right">
+    <button class="header-search" title="Search">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="#555" stroke-width="1.6"/>
+        <line x1="10" y1="10" x2="14" y2="14" stroke="#555" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button class="header-cta" onclick="document.getElementById('contractFile').click()">
+      Start Audit <span class="cta-arrow">&#8250;</span>
+    </button>
+  </div>
 </header>
 
 <div class="page-bg">
