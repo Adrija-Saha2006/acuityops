@@ -1,5 +1,8 @@
 import uuid
+from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from langgraph.types import Command
 
@@ -11,6 +14,9 @@ app = FastAPI(
     description="Autonomous vendor & contract compliance agent with human-in-the-loop approval.",
     version="1.0.0",
 )
+
+_STATIC = Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=_STATIC), name="static")
 
 # Compile ONCE at startup. Same instance (and its checkpointer) serves every request.
 GRAPH = build_graph()
@@ -33,8 +39,13 @@ class ApprovalRequest(BaseModel):
 
 # ---- Endpoints -------------------------------------------------------------
 
-@app.get("/", tags=["Health"])
+@app.get("/", include_in_schema=False)
 async def root():
+    return FileResponse(_STATIC / "index.html")
+
+
+@app.get("/health", tags=["Health"])
+async def health():
     return {"status": "ok", "service": "AcuityOps"}
 
 

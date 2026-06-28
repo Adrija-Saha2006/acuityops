@@ -58,12 +58,19 @@ _MOCK_RULES = [
 
 
 def _real_extract(contract_text: str) -> list[dict]:
-    from langchain_google_genai import ChatGoogleGenerativeAI
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
-        temperature=0,
-        google_api_key=os.environ["GEMINI_API_KEY"],
-    )
+    # Groq is used when available (free tier, no card needed).
+    # Falls back to Gemini if GROQ_API_KEY is not set.
+    groq_key = os.getenv("GROQ_API_KEY")
+    if groq_key:
+        from langchain_groq import ChatGroq
+        llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0, api_key=groq_key)
+    else:
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        llm = ChatGoogleGenerativeAI(
+            model="gemini-2.0-flash",
+            temperature=0,
+            google_api_key=os.environ["GEMINI_API_KEY"],
+        )
     structured_llm = llm.with_structured_output(ContractRules)
     result: ContractRules = structured_llm.invoke(
         [

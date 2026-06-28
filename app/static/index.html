@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AcuityOps — Vendor Compliance Agent</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+    header {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    header h1 { font-size: 1.4rem; font-weight: 700; color: #f1f5f9; }
+    header span { font-size: 0.8rem; color: #64748b; background: #0f172a; padding: 3px 10px; border-radius: 99px; border: 1px solid #334155; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+
+    .step {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .step.disabled { opacity: 0.4; pointer-events: none; }
+    .step-badge {
+      position: absolute;
+      top: -12px; left: 20px;
+      background: #3b82f6;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 99px;
+      letter-spacing: 0.05em;
+    }
+    .step h2 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; color: #f1f5f9; }
+    .step p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 16px; }
+
+    label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px; }
+    input[type=file], textarea, input[type=text] {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #e2e8f0;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    textarea { resize: vertical; min-height: 120px; font-family: monospace; }
+    input[type=file] { cursor: pointer; }
+    input:focus, textarea:focus { border-color: #3b82f6; }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s;
+      margin-top: 12px;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-danger  { background: #ef4444; color: white; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .result {
+      margin-top: 14px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 0.82rem;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 260px;
+      overflow-y: auto;
+      display: none;
+    }
+    .result.show { display: block; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-yellow { background: #fef08a22; color: #fde047; border: 1px solid #fde04744; }
+    .badge-green  { background: #bbf7d022; color: #4ade80; border: 1px solid #4ade8044; }
+    .badge-red    { background: #fecaca22; color: #f87171; border: 1px solid #f8717144; }
+
+    .violation-card {
+      background: #1e293b;
+      border: 1px solid #ef444433;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+    }
+    .violation-card .name { font-weight: 700; color: #f87171; font-size: 0.9rem; }
+    .violation-card .detail { color: #94a3b8; font-size: 0.8rem; margin-top: 4px; }
+    .violation-card .penalty { color: #fde047; font-size: 0.85rem; font-weight: 600; margin-top: 6px; }
+
+    .dispute-box {
+      background: #0f172a;
+      border: 1px solid #3b82f644;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 0.82rem;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 220px;
+      overflow-y: auto;
+      margin-top: 12px;
+      color: #93c5fd;
+    }
+
+    .status-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .pipeline {
+      display: flex;
+      gap: 0;
+      margin-bottom: 28px;
+      overflow-x: auto;
+    }
+    .pipeline-step {
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+      padding: 10px 6px;
+      font-size: 0.72rem;
+      color: #475569;
+      border-top: 2px solid #334155;
+      position: relative;
+    }
+    .pipeline-step.active { color: #3b82f6; border-color: #3b82f6; }
+    .pipeline-step.done   { color: #10b981; border-color: #10b981; }
+    .pipeline-step .icon  { font-size: 1.1rem; display: block; margin-bottom: 4px; }
+
+    #toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: #1e293b; border: 1px solid #334155;
+      border-radius: 10px; padding: 12px 20px;
+      font-size: 0.85rem; color: #e2e8f0;
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s; z-index: 999;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>AcuityOps</h1>
+  <span>Vendor Compliance Agent</span>
+</header>
+
+<div class="container">
+
+  <!-- Pipeline tracker -->
+  <div class="pipeline">
+    <div class="pipeline-step" id="pipe-upload"><span class="icon">📄</span>Upload Contract</div>
+    <div class="pipeline-step" id="pipe-audit"><span class="icon">🔍</span>Run Audit</div>
+    <div class="pipeline-step" id="pipe-gather"><span class="icon">🤖</span>Auto-Gather</div>
+    <div class="pipeline-step" id="pipe-dispute"><span class="icon">📝</span>Draft Dispute</div>
+    <div class="pipeline-step" id="pipe-approve"><span class="icon">✅</span>Human Approval</div>
+  </div>
+
+  <!-- Step 1: Upload -->
+  <div class="step" id="step-upload">
+    <div class="step-badge">STEP 1</div>
+    <h2>Upload Contract</h2>
+    <p>Upload your vendor SLA (.txt or .pdf). The system extracts every enforceable rule.</p>
+    <label>Contract file</label>
+    <input type="file" id="contractFile" accept=".txt,.pdf" />
+    <button class="btn btn-primary" onclick="uploadContract()">Extract Rules</button>
+    <div class="result" id="uploadResult"></div>
+  </div>
+
+  <!-- Step 2: Audit -->
+  <div class="step disabled" id="step-audit">
+    <div class="step-badge">STEP 2</div>
+    <h2>Submit Vendor Logs</h2>
+    <p>Paste the vendor's operational metrics as JSON. Missing metrics are fetched automatically.</p>
+    <label>Operational logs (JSON array)</label>
+    <textarea id="logsInput">[
+  { "metric": "uptime", "value": 98.7, "unit": "percent", "period": "2026-05" },
+  { "metric": "response_time", "value": 5.2, "unit": "hours", "period": "2026-05" }
+]</textarea>
+    <button class="btn btn-primary" onclick="runAudit()">Run Audit</button>
+    <div class="result" id="auditResult"></div>
+  </div>
+
+  <!-- Step 3: Review & Approve -->
+  <div class="step disabled" id="step-approve">
+    <div class="step-badge">STEP 3</div>
+    <h2>Review &amp; Approve</h2>
+    <p>The agent paused for human review. Inspect the violations and the drafted dispute letter, then decide.</p>
+    <div id="violationsList"></div>
+    <div id="disputeBox"></div>
+    <div style="display:flex; gap:10px; margin-top:16px;">
+      <button class="btn btn-success" onclick="decide('approve')">Approve &amp; Send Dispute</button>
+      <button class="btn btn-danger"  onclick="decide('reject')">Reject</button>
+    </div>
+    <div class="result" id="approveResult"></div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+  let contractId = null;
+  let taskId     = null;
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function setPipe(step) {
+    const steps = ['upload','audit','gather','dispute','approve'];
+    steps.forEach((s, i) => {
+      const el = document.getElementById('pipe-' + s);
+      el.classList.remove('active','done');
+      const idx = steps.indexOf(step);
+      if (i < idx) el.classList.add('done');
+      else if (i === idx) el.classList.add('active');
+    });
+  }
+
+  function showResult(id, text, color) {
+    const el = document.getElementById(id);
+    el.style.display = 'block';
+    el.style.color = color || '#94a3b8';
+    el.textContent = text;
+  }
+
+  async function uploadContract() {
+    const file = document.getElementById('contractFile').files[0];
+    if (!file) { toast('Select a file first'); return; }
+
+    const form = new FormData();
+    form.append('file', file);
+    setPipe('upload');
+
+    try {
+      const res = await fetch('/upload-contract/', { method: 'POST', body: form });
+      const data = await res.json();
+      if (!res.ok) { showResult('uploadResult', 'Error: ' + (data.detail || res.status), '#f87171'); return; }
+
+      contractId = data.contract_id;
+      const lines = [`Contract uploaded successfully`, `Rules extracted: ${data.rules_extracted}`, ``];
+      data.rules.forEach(r => {
+        lines.push(`  ${r.metric_name}: ${r.operator} ${r.threshold} ${r.unit}  |  penalty $${r.penalty_amount} ${r.penalty_unit || ''}`);
+      });
+      showResult('uploadResult', lines.join('\n'), '#4ade80');
+
+      document.getElementById('step-audit').classList.remove('disabled');
+      setPipe('audit');
+      toast('Contract parsed — ' + data.rules_extracted + ' rules found');
+    } catch(e) {
+      showResult('uploadResult', 'Network error: ' + e.message, '#f87171');
+    }
+  }
+
+  async function runAudit() {
+    if (!contractId) { toast('Upload a contract first'); return; }
+    let logs;
+    try { logs = JSON.parse(document.getElementById('logsInput').value); }
+    catch(e) { toast('Invalid JSON in logs'); return; }
+
+    setPipe('gather');
+    document.getElementById('auditResult').style.display = 'none';
+
+    try {
+      const res = await fetch('/audit/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contract_id: contractId, operational_logs: logs })
+      });
+      const data = await res.json();
+      if (!res.ok) { showResult('auditResult', 'Error: ' + (data.detail || res.status), '#f87171'); return; }
+
+      taskId = data.task_id;
+
+      if (data.status === 'pending_approval') {
+        setPipe('dispute');
+        showResult('auditResult',
+          `Audit complete. ${data.violations.length} violation(s) found.\nGraph paused — awaiting your decision.`,
+          '#fde047'
+        );
+
+        // Render violations
+        const vList = document.getElementById('violationsList');
+        vList.innerHTML = data.violations.map(v => `
+          <div class="violation-card">
+            <div class="name">${v.metric_name.toUpperCase()}</div>
+            <div class="detail">Required: ${v.expected} &nbsp;|&nbsp; Actual: ${v.actual} ${v.unit} &nbsp;|&nbsp; Deviation: ${v.breach_magnitude} ${v.unit}</div>
+            <div class="penalty">Estimated penalty: $${v.estimated_penalty ?? 'N/A'}</div>
+          </div>`).join('');
+
+        // Render dispute letter
+        if (data.dispute_letter) {
+          document.getElementById('disputeBox').innerHTML =
+            '<label style="margin-top:12px;display:block">Drafted Dispute Letter</label>' +
+            '<div class="dispute-box">' + data.dispute_letter + '</div>';
+        }
+
+        document.getElementById('step-approve').classList.remove('disabled');
+        setPipe('approve');
+        toast('Agent paused — review and approve');
+      } else {
+        setPipe('approve');
+        showResult('auditResult', `Status: ${data.status}\nNo violations found.`, '#4ade80');
+      }
+    } catch(e) {
+      showResult('auditResult', 'Network error: ' + e.message, '#f87171');
+    }
+  }
+
+  async function decide(decision) {
+    if (!taskId) { toast('No active task'); return; }
+
+    try {
+      const res = await fetch(`/tasks/${taskId}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decision })
+      });
+      const data = await res.json();
+      if (!res.ok) { showResult('approveResult', 'Error: ' + (data.detail || res.status), '#f87171'); return; }
+
+      const color = decision === 'approve' ? '#4ade80' : '#f87171';
+      showResult('approveResult',
+        `Decision: ${decision.toUpperCase()}\nFinal status: ${data.final_status}`,
+        color
+      );
+
+      document.getElementById('step-approve').querySelectorAll('.btn').forEach(b => b.disabled = true);
+      setPipe('approve');
+      toast(decision === 'approve' ? 'Dispute approved and sent!' : 'Dispute rejected.');
+    } catch(e) {
+      showResult('approveResult', 'Network error: ' + e.message, '#f87171');
+    }
+  }
+</script>
+</body>
+</html>
