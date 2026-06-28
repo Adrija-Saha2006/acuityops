@@ -1,0 +1,97 @@
+SERVICE LEVEL AGREEMENT
+ACME Cloud Services, Inc. | Master Services Schedule A — Service Levels
+
+This Service Level Agreement (the "Agreement") is entered into as of March 1, 2026 (the "Effective Date") by and
+between ACME Cloud Services, Inc., a Delaware corporation with offices at 1200 Innovation Parkway, Austin,
+Texas (the "Provider"), and Northwind Logistics LLC, a limited liability company organized under the laws of the
+State of California (the "Customer"). The Provider and the Customer are each a "Party" and together the "Parties."
+
+RECITALS
+
+WHEREAS, the Provider offers cloud infrastructure, managed support, and hardware provisioning services; and
+WHEREAS, the Customer wishes to engage the Provider to deliver such services subject to the service levels and
+remedies set forth herein;
+NOW, THEREFORE, in consideration of the mutual covenants contained herein, the Parties agree as follows:
+
+1. DEFINITIONS
+
+1.1 "Downtime" means any period during which the production environment is unavailable to the Customer,
+excluding Scheduled Maintenance.
+1.2 "Measurement Period" means each calendar month during the Term.
+1.3 "Scheduled Maintenance" means maintenance windows notified to the Customer at least five (5) business days
+in advance.
+1.4 "Support Ticket" means a written request for assistance submitted through the Provider's designated support
+portal.
+
+2. SERVICE LEVEL COMMITMENTS
+
+2.1 Availability. The Provider guarantees that the production environment shall maintain a monthly uptime of at
+least 99.9% during each Measurement Period. Availability is calculated as the total minutes in the Measurement
+Period less Downtime, divided by the total minutes, expressed as a percentage.
+
+2.2 Support Responsiveness. The Provider shall deliver a first response to each Support Ticket within two (2) hours
+of submission, measured on a twenty-four (24) hour basis, including weekends and holidays.
+
+2.3 Hardware Delivery. Where the Services include provisioning of physical hardware, the Provider shall complete
+delivery within forty-eight (48) hours of the Customer's order confirmation.
+
+2.4 Reporting. The Provider shall furnish the Customer with a monthly performance report within ten (10) business
+days following the close of each Measurement Period.
+
+3. SERVICE CREDITS AND PENALTIES
+
+3.1 Availability Shortfall. For each hour of Downtime that causes monthly uptime to fall below the 99.9%
+guarantee, the Provider shall credit the Customer five hundred dollars ($500) per hour of such Downtime.
+
+3.2 Late Response. Each Support Ticket that does not receive a first response within the committed two-hour
+window shall incur a penalty of two hundred fifty dollars ($250) per incident.
+
+3.3 Delivery Delay. Hardware deliveries completed after the forty-eight (48) hour commitment shall be penalized
+one hundred dollars ($100) per hour of delay.
+
+3.4 Service credits shall be applied against the following month's invoice and shall constitute the Customer's
+primary remedy for service level failures, subject to Section 6.
+
+4. FEES AND PAYMENT
+
+4.1 The Customer shall pay the fees set forth in the applicable Order Form. All invoices are due net thirty (30) days
+from the invoice date.
+
+4.2 Amounts not paid when due shall accrue interest at a rate of 1.5% per month, or the maximum rate permitted by
+law, whichever is lower.
+
+5. TERM AND TERMINATION
+
+5.1 This Agreement commences on the Effective Date and continues for an initial term of twelve (12) months,
+renewing automatically for successive twelve (12) month terms unless either Party provides written notice of
+non-renewal at least thirty (30) days prior to the end of the then-current term.
+
+5.2 Either Party may terminate this Agreement for a material breach that remains uncured thirty (30) days after
+written notice of such breach.
+
+6. LIMITATION OF LIABILITY
+
+6.1 Except for breaches of confidentiality, each Party's aggregate liability arising out of or related to this Agreement
+shall not exceed fifty thousand dollars ($50,000).
+
+6.2 In no event shall either Party be liable for indirect, incidental, or consequential damages, even if advised of the
+possibility of such damages.
+
+7. CONFIDENTIALITY
+
+7.1 Each Party shall protect the other's Confidential Information using no less than reasonable care and shall not
+disclose it to third parties except as required to perform under this Agreement or as compelled by law.
+
+8. GOVERNING LAW
+
+8.1 This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware,
+without regard to its conflict of laws principles.
+
+IN WITNESS WHEREOF, the Parties have executed this Agreement as of the Effective Date.
+
+ACME CLOUD SERVICES, INC.              NORTHWIND LOGISTICS LLC
+
+By: ____________________________       By: ____________________________
+Name: Dana Whitfield                   Name: Marcus Lee
+Title: VP, Service Delivery            Title: Director of Operations
+Date: __________________________       Date: __________________________
