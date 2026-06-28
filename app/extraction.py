@@ -11,60 +11,62 @@ if _explicit is not None:
 else:
     _USE_MOCK = not bool(os.getenv("GROQ_API_KEY"))
 
-_EXTRACTION_PROMPT = """You extract enforceable obligations from service contracts.
+_EXTRACTION_PROMPT = """You extract every enforceable performance obligation from service contracts.
 
 Think step by step INTERNALLY before answering:
-1. Find every clause that states a measurable uptime or performance target (a number + unit).
-2. Determine whether the actual value must be >=, <=, >, <, or == the target to comply.
-3. Capture the penalty. For percentage-based service credits (e.g. "10% of monthly bill"),
-   set penalty_amount to that percentage (e.g. 10) and penalty_unit to "percent_monthly_bill".
-   For fixed dollar penalties, set penalty_unit to "per_hour" or "per_incident".
+1. Read the entire contract and find EVERY clause that states a measurable target with a concrete number and unit.
+2. Determine the compliance direction: must the actual value be >=, <=, >, <, or == the target?
+3. Capture the penalty exactly as written. Map it to penalty_amount and penalty_unit.
 
-Only extract clauses with a concrete numeric threshold. Ignore vague language.
-Do NOT invent thresholds or penalties that are not explicitly stated.
+Supported contract types include (but are not limited to):
+- Cloud / hosting SLAs (uptime %, response time)
+- Telecom SLAs (packet loss %, latency ms, throughput Mbps)
+- Delivery / logistics SLAs (delivery time hours, pickup time hours)
+- Support SLAs (first response time hours, resolution time hours)
+- Software / SaaS SLAs (API availability %, error rate %, data retention days)
+- Manufacturing / supply chain SLAs (lead time days, defect rate %)
 
-EXAMPLE — fixed dollar penalty:
-Clause: "Uptime must be at least 99.95% monthly; downtime is penalized $1000/hour."
-Extracted: metric_name="uptime", operator=">=", threshold=99.95, unit="percent",
-           penalty_amount=1000, penalty_unit="per_hour"
+Penalty mapping rules:
+- "$500 per hour" → penalty_amount=500, penalty_unit="per_hour"
+- "$250 per incident" → penalty_amount=250, penalty_unit="per_incident"
+- "10% of monthly bill" → penalty_amount=10, penalty_unit="percent_monthly_bill"
+- "flat fee of $1000" → penalty_amount=1000, penalty_unit="flat"
+- No penalty stated → penalty_amount=null, penalty_unit=null
 
-EXAMPLE — percentage service credit (AWS-style):
-Clause: "Monthly Uptime Percentage of at least 99.99%. If below 99.99% but >= 99.0%,
-         Service Credit of 10% of monthly bill."
-Extracted: metric_name="region_uptime", operator=">=", threshold=99.99, unit="percent",
-           penalty_amount=10, penalty_unit="percent_monthly_bill"
+Only extract clauses with a concrete numeric threshold. Skip vague language like "reasonable" or "timely".
+Do NOT invent numbers. Do NOT combine clauses. Extract each obligation as a separate rule.
 
-EXAMPLE — second tier of same SLA:
-Clause: "Instance-Level Uptime Percentage of at least 99.5%. If below 99.5% but >= 99.0%,
-         Service Credit of 10% of monthly bill."
-Extracted: metric_name="instance_uptime", operator=">=", threshold=99.5, unit="percent",
-           penalty_amount=10, penalty_unit="percent_monthly_bill"
+EXAMPLE 1 — cloud uptime with dollar penalty:
+Clause: "System uptime must be at least 99.9% monthly. Downtime below guarantee incurs $500/hour."
+→ metric_name="uptime", operator=">=", threshold=99.9, unit="percent", penalty_amount=500, penalty_unit="per_hour"
+
+EXAMPLE 2 — support response time:
+Clause: "All support tickets must receive a first response within 2 hours. Each breach is penalized $250 per incident."
+→ metric_name="response_time", operator="<=", threshold=2, unit="hours", penalty_amount=250, penalty_unit="per_incident"
+
+EXAMPLE 3 — delivery time:
+Clause: "Hardware deliveries must complete within 48 hours of order confirmation. Late deliveries are penalized $100/hour."
+→ metric_name="delivery_time", operator="<=", threshold=48, unit="hours", penalty_amount=100, penalty_unit="per_hour"
+
+EXAMPLE 4 — telecom packet loss:
+Clause: "Monthly packet loss shall not exceed 0.1% averaged across all links."
+→ metric_name="packet_loss", operator="<=", threshold=0.1, unit="percent", penalty_amount=null, penalty_unit=null
+
+EXAMPLE 5 — cloud uptime with percentage credit:
+Clause: "Monthly Uptime of at least 99.99%. If below 99.99% but >= 99.0%, Service Credit of 10% of monthly bill."
+→ metric_name="region_uptime", operator=">=", threshold=99.99, unit="percent", penalty_amount=10, penalty_unit="percent_monthly_bill"
+
+EXAMPLE 6 — API error rate:
+Clause: "API error rate must remain below 0.5% per month. Breach incurs a $2000 flat credit."
+→ metric_name="api_error_rate", operator="<=", threshold=0.5, unit="percent", penalty_amount=2000, penalty_unit="flat"
+
+EXAMPLE 7 — resolution time:
+Clause: "Critical issues must be resolved within 4 hours of being reported."
+→ metric_name="resolution_time", operator="<=", threshold=4, unit="hours", penalty_amount=null, penalty_unit=null
 """
-
-# Hardcoded rules matching aws_ec2_sla.txt — used when USE_MOCK_LLM=true
-_MOCK_RULES = [
-    {
-        "metric_name": "region_uptime",
-        "operator": ">=",
-        "threshold": 99.99,
-        "unit": "percent",
-        "penalty_amount": 10.0,
-        "penalty_unit": "percent_monthly_bill",
-    },
-    {
-        "metric_name": "instance_uptime",
-        "operator": ">=",
-        "threshold": 99.5,
-        "unit": "percent",
-        "penalty_amount": 10.0,
-        "penalty_unit": "percent_monthly_bill",
-    },
-]
 
 
 def _real_extract(contract_text: str) -> list[dict]:
-    # Groq is used when available (free tier, no card needed).
-    # Falls back to Gemini if GROQ_API_KEY is not set.
     groq_key = os.getenv("GROQ_API_KEY")
     if groq_key:
         from langchain_groq import ChatGroq
@@ -87,14 +89,11 @@ def _real_extract(contract_text: str) -> list[dict]:
 
 
 def _deduplicate_rules(rules: list[dict]) -> list[dict]:
-    """Keep only the primary compliance threshold per metric.
+    """Keep only the strictest rule per metric.
 
-    AWS-style SLAs define tiered credit tables (10%/30%/100%) for the same metric.
-    The LLM often extracts each tier row as a separate rule. We collapse them:
-    - Keep the strictest >= rule per metric (highest threshold = the SLA commitment)
-    - Keep the strictest <= rule per metric (lowest threshold)
-    - Discard the tier rows (< 99.0, < 95.0 etc.) since the auditor recomputes the
-      correct tier from the actual value at violation time.
+    Tiered SLAs (e.g. AWS 10%/30%/100% credit table) produce multiple rows for the same
+    metric. We keep the primary compliance threshold only — the auditor recomputes the
+    correct penalty tier from the actual value.
     """
     by_metric: dict[str, list[dict]] = {}
     for rule in rules:
@@ -112,10 +111,16 @@ def _deduplicate_rules(rules: list[dict]) -> list[dict]:
 
 
 def extract_rules(contract_text: str) -> list[dict]:
-    """Returns a list of rule dicts. Uses mock by default; set USE_MOCK_LLM=false for real LLM."""
+    """Extract enforceable rules from contract text.
+
+    Uses the real LLM when GROQ_API_KEY is set (handles any contract type).
+    Falls back to mock only when no API key is available.
+    """
     if _USE_MOCK:
-        print("[extraction] Using mock rules (set USE_MOCK_LLM=false to use real LLM)")
-        return _MOCK_RULES
+        raise RuntimeError(
+            "No GROQ_API_KEY found. Set GROQ_API_KEY in your .env file or environment "
+            "to enable real contract extraction. Get a free key at console.groq.com."
+        )
     rules = _real_extract(contract_text)
     return _deduplicate_rules(rules)
 
