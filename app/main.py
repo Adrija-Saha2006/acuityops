@@ -69,6 +69,9 @@ async def run_audit(req: AuditRequest):
     if req.contract_id not in CONTRACTS:
         raise HTTPException(status_code=404, detail="Unknown contract_id.")
 
+    if not req.operational_logs:
+        raise HTTPException(status_code=400, detail="operational_logs must not be empty.")
+
     task_id = str(uuid.uuid4())
     config = {"configurable": {"thread_id": task_id}}
     init_state = {
@@ -96,12 +99,17 @@ async def run_audit(req: AuditRequest):
             "dispute_letter": payload["dispute_letter"],
         }
 
-    # No violations — graph completed without pausing
+    # No violations — graph completed without pausing.
+    # Surface any metrics the tool also couldn't find, for transparency.
+    unverifiable = [
+        g["metric"] for g in result.get("gathered_info", []) if g.get("not_found")
+    ]
     TASKS[task_id] = {"status": result.get("status", "completed")}
     return {
         "task_id": task_id,
         "status": result.get("status"),
         "violations": result.get("violations", []),
+        "unverifiable_metrics": unverifiable,
         "dispute_letter": None,
     }
 
