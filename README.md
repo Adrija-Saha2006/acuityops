@@ -61,50 +61,62 @@ or, with a persistent checkpointer, from a different process hours later.
 | Layer | Library |
 |-------|---------|
 | Agent orchestration | LangGraph 1.x |
-| LLM integration | LangChain 1.x + langchain-google-genai |
-| LLM | Gemini 2.0 Flash (mock by default; set `USE_MOCK_LLM=false`) |
+| LLM integration | LangChain 1.x + langchain-groq |
+| LLM | Llama 3.3 70B via Groq (free tier) |
 | API | FastAPI 0.115+ with async endpoints |
+| Frontend | Vanilla HTML/CSS/JS served via FastAPI static files |
 | Data validation | Pydantic v2 |
 | PDF parsing | pypdf |
 
 ## Run it
 
 ```bash
-# 1. Install dependencies
+# 1. Clone the repo
+git clone https://github.com/YOUR-USERNAME/acuityops.git
+cd acuityops
+
+# 2. Create virtual environment and install dependencies
 python -m venv .venv
 .venv\Scripts\activate        # Windows
 pip install -r requirements.txt
 
-# 2. Set your API key in .env
-# GEMINI_API_KEY=AIzaSy...
-# USE_MOCK_LLM=false   <- add this line to use the real LLM
+# 3. Add your API key to .env
+# GROQ_API_KEY=gsk_...
+# USE_MOCK_LLM=false
 
-# 3. Start the server
+# 4. Start the server
 uvicorn app.main:app --reload
 ```
 
-Open **http://127.0.0.1:8000/docs** for the interactive Swagger UI, then:
+Open **http://127.0.0.1:8000** in your browser. You will see the web UI.
 
-**Step 1** — `POST /upload-contract/` — upload `data/sample_contract.txt`
-  - Copy the returned `contract_id`
+## Demo walkthrough
 
-**Step 2** — `POST /audit/` — submit logs with the `contract_id`
-```json
-{
-  "contract_id": "<paste-id>",
-  "operational_logs": [
-    {"metric": "uptime", "value": 99.2, "unit": "percent"},
-    {"metric": "response_time", "value": 4.5, "unit": "hours"}
-  ]
-}
-```
-  - Returns `status: pending_approval` + the drafted dispute letter
-  - Note: `delivery_time` is intentionally absent — the agent fetches it automatically
+**Step 1 — Upload Contract**
+- Click the upload zone under Step 01
+- Select `data/aws_ec2_sla.txt` (or any `.txt`/`.pdf` SLA)
+- Click **Extract Rules** — the LLM reads the contract and returns structured rules
 
-**Step 3** — `GET /tasks/pending-approval` — see the paused run
+**Step 2 — Upload Vendor Logs**
+- Upload any file from `data/logs_*.json`
+- OR use the **Log Generator** (purple Helper panel) — enter the incident month and downtime hours, click Generate
+- Click **Run Audit**
 
-**Step 4** — `POST /tasks/{task_id}/approve` — resume with `{"decision": "approve"}`
-  - Returns `final_status: approved`
+**Step 3 — Review & Approve**
+- Violations appear as cards with breach details and penalty labels
+- The drafted dispute letter is shown below
+- Click **Approve & Send Dispute** to complete the run
+
+## Sample data included
+
+| SLA file | Log file | What it tests |
+|----------|----------|--------------|
+| `aws_ec2_sla.txt` | `sample_logs.json` | Jul 2024 Kinesis outage — 10% credit |
+| `aws_ec2_sla.txt` | `logs_aws_dec2021_critical.json` | Dec 2021 critical outage — 30% credit |
+| `aws_ec2_sla.txt` | `logs_aws_nov2020.json` | Nov 2020 Kinesis cascade — 10% credit |
+| `aws_ec2_sla.txt` | `logs_cloudflare_jul2019.json` | 27-min Cloudflare outage |
+| `ACME_Cloud_Services_SLA.txt` | `logs_acme_violations.json` | Dollar penalty violations |
+| `ACME_Cloud_Services_SLA.txt` | `logs_acme_compliant.json` | Compliant month — no violations |
 
 ## Design decisions and trade-offs
 
