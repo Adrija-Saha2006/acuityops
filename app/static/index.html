@@ -4,173 +4,259 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AcuityOps — Vendor Compliance Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
 
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: #ffffff;
+      color: #0a0a0a;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
     header {
-      background: #1e293b;
-      border-bottom: 1px solid #334155;
-      padding: 16px 32px;
+      background: #ffffff;
+      border-bottom: 2px solid #0047FF;
+      padding: 0 40px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    header h1 { font-size: 1.4rem; font-weight: 700; color: #f1f5f9; }
-    header span { font-size: 0.8rem; color: #64748b; background: #0f172a; padding: 3px 10px; border-radius: 99px; border: 1px solid #334155; }
-
-    .container { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
-
-    .step {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 20px;
-      position: relative;
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .logo-box {
+      width: 34px; height: 34px;
+      border: 2px solid #0047FF;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 900;
+      color: #0047FF; letter-spacing: -0.5px;
+      flex-shrink: 0;
     }
-    .step.disabled { opacity: 0.4; pointer-events: none; }
-    .step-badge {
-      position: absolute;
-      top: -12px; left: 20px;
-      background: #3b82f6;
-      color: white;
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 99px;
-      letter-spacing: 0.05em;
+    header h1 {
+      font-size: 1.05rem; font-weight: 900;
+      color: #0a0a0a; letter-spacing: -0.5px;
     }
-    .step h2 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; color: #f1f5f9; }
-    .step p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 16px; }
-
-    label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px; }
-    input[type=file], textarea, input[type=text] {
-      width: 100%;
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      color: #e2e8f0;
-      padding: 10px 14px;
-      font-size: 0.85rem;
-      outline: none;
+    .header-tag {
+      font-size: 0.65rem; font-weight: 700;
+      color: #0047FF; border: 1.5px solid #0047FF;
+      padding: 2px 9px; letter-spacing: 0.1em;
+      text-transform: uppercase;
     }
-    textarea { resize: vertical; min-height: 120px; font-family: monospace; }
-    input[type=file] { cursor: pointer; }
-    input:focus, textarea:focus { border-color: #3b82f6; }
-
-    .btn {
-      display: inline-block;
-      padding: 10px 22px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: opacity 0.15s;
-      margin-top: 12px;
-    }
-    .btn:hover { opacity: 0.85; }
-    .btn-primary { background: #3b82f6; color: white; }
-    .btn-success { background: #10b981; color: white; }
-    .btn-danger  { background: #ef4444; color: white; }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .result {
-      margin-top: 14px;
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 14px;
-      font-size: 0.82rem;
-      font-family: monospace;
-      white-space: pre-wrap;
-      max-height: 260px;
-      overflow-y: auto;
-      display: none;
-    }
-    .result.show { display: block; }
-
-    .badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 99px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    .badge-yellow { background: #fef08a22; color: #fde047; border: 1px solid #fde04744; }
-    .badge-green  { background: #bbf7d022; color: #4ade80; border: 1px solid #4ade8044; }
-    .badge-red    { background: #fecaca22; color: #f87171; border: 1px solid #f8717144; }
-
-    .violation-card {
-      background: #1e293b;
-      border: 1px solid #ef444433;
-      border-radius: 8px;
-      padding: 12px 16px;
-      margin-bottom: 10px;
-    }
-    .violation-card .name { font-weight: 700; color: #f87171; font-size: 0.9rem; }
-    .violation-card .detail { color: #94a3b8; font-size: 0.8rem; margin-top: 4px; }
-    .violation-card .penalty { color: #fde047; font-size: 0.85rem; font-weight: 600; margin-top: 6px; }
-
-    .dispute-box {
-      background: #0f172a;
-      border: 1px solid #3b82f644;
-      border-radius: 8px;
-      padding: 16px;
-      font-size: 0.82rem;
-      font-family: monospace;
-      white-space: pre-wrap;
-      max-height: 220px;
-      overflow-y: auto;
-      margin-top: 12px;
-      color: #93c5fd;
+    .header-right {
+      font-size: 0.72rem; color: #999;
+      letter-spacing: 0.05em; font-weight: 500;
     }
 
-    .status-bar {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
+    /* ── DECORATIVE CORNERS ── */
+    .deco { position: fixed; font-size: 1.1rem; color: #ddd;
+            font-weight: 300; pointer-events: none; z-index: 0; line-height: 1; }
+    .deco-tl { top: 76px;  left: 18px;  }
+    .deco-tr { top: 76px;  right: 18px; }
+    .deco-bl { bottom: 28px; left: 18px;  }
+    .deco-br { bottom: 28px; right: 18px; }
 
+    /* ── CONTAINER ── */
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 24px 72px; position: relative; z-index: 1; }
+
+    /* ── PIPELINE ── */
     .pipeline {
       display: flex;
-      gap: 0;
-      margin-bottom: 28px;
-      overflow-x: auto;
+      border: 1.5px solid #e0e0e0;
+      margin-bottom: 44px;
+      overflow: hidden;
     }
     .pipeline-step {
       flex: 1;
-      min-width: 120px;
       text-align: center;
-      padding: 10px 6px;
-      font-size: 0.72rem;
-      color: #475569;
-      border-top: 2px solid #334155;
+      padding: 13px 6px 11px;
+      font-size: 0.63rem;
+      font-weight: 800;
+      color: #c0c0c0;
+      border-right: 1.5px solid #e0e0e0;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      transition: background 0.2s, color 0.2s;
+    }
+    .pipeline-step:last-child { border-right: none; }
+    .pipeline-step .icon { font-size: 0.95rem; display: block; margin-bottom: 5px; }
+    .pipeline-step.active { background: #0047FF; color: #fff; border-color: #0047FF; }
+    .pipeline-step.done   { background: #AAFF4D; color: #0a0a0a; border-color: #AAFF4D; }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 0.62rem; font-weight: 800;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: #bbb; margin-bottom: 18px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .section-label::after { content:''; flex:1; height:1px; background:#ebebeb; }
+
+    /* ── STEP CARDS ── */
+    .step {
+      background: #ffffff;
+      border: 1.5px solid #e8e8e8;
+      border-left: 4px solid #0047FF;
+      padding: 26px 26px 22px;
+      margin-bottom: 18px;
       position: relative;
     }
-    .pipeline-step.active { color: #3b82f6; border-color: #3b82f6; }
-    .pipeline-step.done   { color: #10b981; border-color: #10b981; }
-    .pipeline-step .icon  { font-size: 1.1rem; display: block; margin-bottom: 4px; }
+    .step.disabled { opacity: 0.32; pointer-events: none; }
+    .step::after {
+      content: '+';
+      position: absolute; top: 12px; right: 16px;
+      font-size: 1.1rem; font-weight: 300; color: #d8d8d8; line-height: 1;
+    }
 
+    .step-num {
+      font-size: 0.62rem; font-weight: 800;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: #0047FF; margin-bottom: 5px;
+    }
+    .step h2 {
+      font-size: 1.1rem; font-weight: 900;
+      color: #0a0a0a; margin-bottom: 6px; letter-spacing: -0.3px;
+    }
+    .step p { font-size: 0.8rem; color: #777; margin-bottom: 18px; line-height: 1.6; }
+
+    .step-helper { border-left-color: #AAFF4D; }
+    .step-helper .step-num { color: #2d8000; }
+
+    /* ── LABELS ── */
+    label {
+      display: block; font-size: 0.68rem; font-weight: 700;
+      color: #888; margin-bottom: 6px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    /* ── INPUTS ── */
+    input[type=file],
+    textarea,
+    input[type=text],
+    input[type=number],
+    input[type=month],
+    select {
+      width: 100%;
+      background: #fafafa;
+      border: 1.5px solid #d8d8d8;
+      border-radius: 0;
+      color: #0a0a0a;
+      padding: 10px 13px;
+      font-size: 0.83rem;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s;
+      appearance: none;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: #0047FF; background: #fff;
+    }
+    textarea { resize: vertical; min-height: 110px; font-family: monospace; font-size: 0.78rem; }
+    input[type=file] { cursor: pointer; }
+    select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 32px; }
+
+    /* ── GENERATOR GRID ── */
+    .gen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+
+    /* ── GEN PREVIEW ── */
+    #gen-preview {
+      background: #f5f5f5; border: 1.5px solid #e0e0e0;
+      padding: 12px 14px; font-size: 0.78rem;
+      color: #777; font-family: monospace; line-height: 1.7;
+      margin-bottom: 2px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-block; padding: 11px 26px;
+      font-size: 0.75rem; font-weight: 800;
+      cursor: pointer; border: none;
+      transition: opacity 0.15s, transform 0.1s;
+      margin-top: 14px; letter-spacing: 0.08em;
+      text-transform: uppercase; border-radius: 0;
+      font-family: inherit;
+    }
+    .btn:hover  { opacity: 0.82; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
+    .btn-primary { background: #0047FF; color: #fff; }
+    .btn-success { background: #AAFF4D; color: #0a0a0a; }
+    .btn-danger  { background: #0a0a0a; color: #fff; }
+    .btn-helper  { background: #AAFF4D; color: #0a0a0a; }
+
+    /* ── RESULT BOXES ── */
+    .result {
+      margin-top: 14px; background: #f5f5f5;
+      border: 1.5px solid #e0e0e0;
+      padding: 13px; font-size: 0.78rem;
+      font-family: monospace; white-space: pre-wrap;
+      max-height: 220px; overflow-y: auto; display: none;
+      line-height: 1.6;
+    }
+
+    /* ── VIOLATION CARDS ── */
+    .violation-card {
+      background: #fff;
+      border: 1.5px solid #e8e8e8;
+      border-left: 4px solid #0047FF;
+      padding: 14px 18px; margin-bottom: 10px;
+    }
+    .violation-card .name {
+      font-weight: 900; color: #0047FF;
+      font-size: 0.82rem; letter-spacing: 0.07em; text-transform: uppercase;
+    }
+    .violation-card .detail { color: #777; font-size: 0.77rem; margin-top: 5px; line-height: 1.5; }
+    .violation-card .penalty {
+      display: inline-block; margin-top: 9px;
+      background: #AAFF4D; color: #0a0a0a;
+      font-size: 0.78rem; font-weight: 800;
+      padding: 3px 10px; letter-spacing: 0.04em;
+    }
+
+    /* ── DISPUTE BOX ── */
+    .dispute-box {
+      background: #f0f5ff;
+      border: 1.5px solid #0047FF33;
+      border-left: 4px solid #0047FF;
+      padding: 14px; font-size: 0.76rem;
+      font-family: monospace; white-space: pre-wrap;
+      max-height: 200px; overflow-y: auto;
+      margin-top: 10px; color: #0a3080; line-height: 1.6;
+    }
+
+    /* ── TOAST ── */
     #toast {
-      position: fixed; bottom: 24px; right: 24px;
-      background: #1e293b; border: 1px solid #334155;
-      border-radius: 10px; padding: 12px 20px;
-      font-size: 0.85rem; color: #e2e8f0;
+      position: fixed; bottom: 28px; right: 28px;
+      background: #0a0a0a; border-left: 4px solid #0047FF;
+      padding: 12px 20px; font-size: 0.78rem;
+      font-weight: 700; color: #fff;
       transform: translateY(80px); opacity: 0;
-      transition: all 0.3s; z-index: 999;
+      transition: all 0.25s; z-index: 999;
+      letter-spacing: 0.04em; font-family: inherit;
     }
     #toast.show { transform: translateY(0); opacity: 1; }
   </style>
 </head>
 <body>
 
+<!-- Decorative corner crosses -->
+<span class="deco deco-tl">+</span>
+<span class="deco deco-tr">+</span>
+<span class="deco deco-bl">+</span>
+<span class="deco deco-br">+</span>
+
 <header>
-  <h1>AcuityOps</h1>
-  <span>Vendor Compliance Agent</span>
+  <div class="header-left">
+    <div class="logo-box">AO</div>
+    <h1>AcuityOps</h1>
+    <span class="header-tag">Compliance Agent</span>
+  </div>
+  <div class="header-right">Vendor SLA Audit System</div>
 </header>
 
 <div class="container">
@@ -184,9 +270,11 @@
     <div class="pipeline-step" id="pipe-approve"><span class="icon">✅</span>Human Approval</div>
   </div>
 
-  <!-- Step 1: Upload -->
+  <div class="section-label">Workflow</div>
+
+  <!-- Step 1: Upload Contract -->
   <div class="step" id="step-upload">
-    <div class="step-badge">STEP 1</div>
+    <div class="step-num">Step 01</div>
     <h2>Upload Contract</h2>
     <p>Upload your vendor SLA (.txt or .pdf). The system extracts every enforceable rule.</p>
     <label>Contract file</label>
@@ -195,15 +283,15 @@
     <div class="result" id="uploadResult"></div>
   </div>
 
-  <!-- Log Generator -->
-  <div class="step disabled" id="step-generator">
-    <div class="step-badge" style="background:#8b5cf6">HELPER</div>
+  <!-- Helper: Log Generator -->
+  <div class="step step-helper disabled" id="step-generator">
+    <div class="step-num">Helper</div>
     <h2>Log Generator</h2>
     <p>Don't have a log file? Enter the incident details and we'll compute the uptime and write the JSON for you.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="gen-grid">
       <div>
         <label>Metric name</label>
-        <select id="gen-metric" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#94a3b8;padding:10px 14px;font-size:0.85rem;outline:none">
+        <select id="gen-metric">
           <option value="" disabled selected>-- select a metric --</option>
           <optgroup label="AWS">
             <option value="region_uptime">region_uptime (Region-Level)</option>
@@ -232,24 +320,20 @@
       </div>
       <div>
         <label>Month &amp; Year of incident</label>
-        <input type="month" id="gen-month"
-               style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;padding:10px 14px;font-size:0.85rem;outline:none" />
+        <input type="month" id="gen-month" />
       </div>
       <div>
         <label>Total downtime (hours)</label>
-        <input type="number" id="gen-hours" placeholder="e.g. 7" min="0" step="0.5"
-               style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;padding:10px 14px;font-size:0.85rem;outline:none" />
+        <input type="number" id="gen-hours" placeholder="e.g. 7" min="0" step="0.5" />
       </div>
     </div>
-    <div id="gen-preview" style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px 16px;font-size:0.8rem;color:#94a3b8;margin-bottom:2px">
-      Fill in the fields above and click Generate.
-    </div>
-    <button class="btn" style="background:#8b5cf6;color:white;margin-top:10px" onclick="generateLog()">Generate Log JSON</button>
+    <div id="gen-preview">Fill in the fields above and click Generate.</div>
+    <button class="btn btn-helper" onclick="generateLog()">Generate Log JSON</button>
   </div>
 
-  <!-- Step 2: Audit -->
+  <!-- Step 2: Upload Logs -->
   <div class="step disabled" id="step-audit">
-    <div class="step-badge">STEP 2</div>
+    <div class="step-num">Step 02</div>
     <h2>Upload Vendor Logs</h2>
     <p>Upload the vendor's operational log file (.json). Missing metrics are fetched automatically by the agent.</p>
     <label>Vendor log file (.json)</label>
@@ -262,12 +346,12 @@
 
   <!-- Step 3: Review & Approve -->
   <div class="step disabled" id="step-approve">
-    <div class="step-badge">STEP 3</div>
+    <div class="step-num">Step 03</div>
     <h2>Review &amp; Approve</h2>
     <p>The agent paused for human review. Inspect the violations and the drafted dispute letter, then decide.</p>
     <div id="violationsList"></div>
     <div id="disputeBox"></div>
-    <div style="display:flex; gap:10px; margin-top:16px;">
+    <div style="display:flex; gap:10px; margin-top:18px; flex-wrap:wrap;">
       <button class="btn btn-success" onclick="decide('approve')">Approve &amp; Send Dispute</button>
       <button class="btn btn-danger"  onclick="decide('reject')">Reject</button>
     </div>
@@ -303,7 +387,7 @@
   function showResult(id, text, color) {
     const el = document.getElementById(id);
     el.style.display = 'block';
-    el.style.color = color || '#94a3b8';
+    el.style.color = color || '#555';
     el.textContent = text;
   }
 
@@ -315,7 +399,7 @@
   });
 
   function generateLog() {
-    const monthVal  = document.getElementById('gen-month').value;   // "2024-07"
+    const monthVal  = document.getElementById('gen-month').value;
     const hours     = parseFloat(document.getElementById('gen-hours').value);
     const metricSel = document.getElementById('gen-metric').value;
     const metric    = metricSel === 'custom'
@@ -327,7 +411,6 @@
     if (isNaN(hours) || hours === '') { toast('Enter downtime in hours'); return; }
     if (!metric)    { toast('Enter a custom metric name'); return; }
 
-    // Calculate days in the selected month
     const [year, month] = monthVal.split('-').map(Number);
     const daysInMonth   = new Date(year, month, 0).getDate();
     const totalMinutes  = daysInMonth * 24 * 60;
@@ -338,14 +421,13 @@
     const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const label = `${monthNames[month-1]} ${year}`;
 
-    // Show calculation breakdown
     document.getElementById('gen-preview').innerHTML =
-      `<span style="color:#4ade80">Calculation:</span><br>` +
-      `  ${daysInMonth} days in ${label} = <b>${totalMinutes.toLocaleString()} total minutes</b><br>` +
-      `  ${hours}h downtime = <b>${downMinutes} minutes unavailable</b><br>` +
-      `  Uptime = (${totalMinutes.toLocaleString()} - ${downMinutes}) / ${totalMinutes.toLocaleString()} x 100 = <b style="color:#fde047">${uptimePct}%</b>`;
+      `<span style="color:#2d8000;font-weight:700">Calculation:</span>\n` +
+      `  ${daysInMonth} days in ${label} = ${totalMinutes.toLocaleString()} total minutes\n` +
+      `  ${hours}h downtime = ${downMinutes} minutes unavailable\n` +
+      `  Uptime = (${totalMinutes.toLocaleString()} - ${downMinutes}) / ${totalMinutes.toLocaleString()} x 100\n` +
+      `  = <span style="color:#0047FF;font-weight:900">${uptimePct}%</span>`;
 
-    // Build the JSON and push to Step 2
     const log = [{ metric, value: uptimePct, unit: "percent", period: monthVal,
                    notes: `${hours}h downtime in ${label} (${downMinutes}/${totalMinutes} min unavailable)` }];
     document.getElementById('logsInput').value = JSON.stringify(log, null, 2);
@@ -357,7 +439,6 @@
     const file = input.files[0];
     if (!file) return;
     if (!file.name.endsWith('.json')) { toast('Please upload a .json file'); return; }
-
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
@@ -381,23 +462,23 @@
     setPipe('upload');
 
     try {
-      const res = await fetch('/upload-contract/', { method: 'POST', body: form });
+      const res  = await fetch('/upload-contract/', { method: 'POST', body: form });
       const data = await res.json();
-      if (!res.ok) { showResult('uploadResult', 'Error: ' + (data.detail || res.status), '#f87171'); return; }
+      if (!res.ok) { showResult('uploadResult', 'Error: ' + (data.detail || res.status), '#cc0000'); return; }
 
       contractId = data.contract_id;
       const lines = [`Contract uploaded successfully`, `Rules extracted: ${data.rules_extracted}`, ``];
       data.rules.forEach(r => {
-        lines.push(`  ${r.metric_name}: ${r.operator} ${r.threshold} ${r.unit}  |  penalty $${r.penalty_amount} ${r.penalty_unit || ''}`);
+        lines.push(`  ${r.metric_name}: ${r.operator} ${r.threshold} ${r.unit}  |  credit: ${r.penalty_amount} ${r.penalty_unit || ''}`);
       });
-      showResult('uploadResult', lines.join('\n'), '#4ade80');
+      showResult('uploadResult', lines.join('\n'), '#2d8000');
 
       document.getElementById('step-generator').classList.remove('disabled');
       document.getElementById('step-audit').classList.remove('disabled');
       setPipe('audit');
       toast('Contract parsed — ' + data.rules_extracted + ' rules found');
     } catch(e) {
-      showResult('uploadResult', 'Network error: ' + e.message, '#f87171');
+      showResult('uploadResult', 'Network error: ' + e.message, '#cc0000');
     }
   }
 
@@ -411,13 +492,13 @@
     document.getElementById('auditResult').style.display = 'none';
 
     try {
-      const res = await fetch('/audit/', {
+      const res  = await fetch('/audit/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contract_id: contractId, operational_logs: logs })
       });
       const data = await res.json();
-      if (!res.ok) { showResult('auditResult', 'Error: ' + (data.detail || res.status), '#f87171'); return; }
+      if (!res.ok) { showResult('auditResult', 'Error: ' + (data.detail || res.status), '#cc0000'); return; }
 
       taskId = data.task_id;
 
@@ -425,22 +506,22 @@
         setPipe('dispute');
         showResult('auditResult',
           `Audit complete. ${data.violations.length} violation(s) found.\nGraph paused — awaiting your decision.`,
-          '#fde047'
+          '#0047FF'
         );
 
-        // Render violations
         const vList = document.getElementById('violationsList');
         vList.innerHTML = data.violations.map(v => `
           <div class="violation-card">
-            <div class="name">${v.metric_name.toUpperCase()}</div>
-            <div class="detail">Required: ${v.expected} &nbsp;|&nbsp; Actual: ${v.actual} ${v.unit} &nbsp;|&nbsp; Deviation: ${v.breach_magnitude} ${v.unit}</div>
-            <div class="penalty">Estimated penalty: $${v.estimated_penalty ?? 'N/A'}</div>
+            <div class="name">${v.metric_name.toUpperCase().replace(/_/g,' ')}</div>
+            <div class="detail">
+              Required: ${v.expected}&nbsp;&nbsp;|&nbsp;&nbsp;Actual: ${v.actual} ${v.unit}&nbsp;&nbsp;|&nbsp;&nbsp;Deviation: ${v.breach_magnitude} ${v.unit}
+            </div>
+            <div class="penalty">${v.penalty_label || 'Penalty: ' + v.estimated_penalty}</div>
           </div>`).join('');
 
-        // Render dispute letter
         if (data.dispute_letter) {
           document.getElementById('disputeBox').innerHTML =
-            '<label style="margin-top:12px;display:block">Drafted Dispute Letter</label>' +
+            '<label style="margin-top:14px;display:block">Drafted Dispute Letter</label>' +
             '<div class="dispute-box">' + data.dispute_letter + '</div>';
         }
 
@@ -449,10 +530,10 @@
         toast('Agent paused — review and approve');
       } else {
         setPipe('approve');
-        showResult('auditResult', `Status: ${data.status}\nNo violations found.`, '#4ade80');
+        showResult('auditResult', `Status: ${data.status}\nNo violations found.`, '#2d8000');
       }
     } catch(e) {
-      showResult('auditResult', 'Network error: ' + e.message, '#f87171');
+      showResult('auditResult', 'Network error: ' + e.message, '#cc0000');
     }
   }
 
@@ -460,15 +541,15 @@
     if (!taskId) { toast('No active task'); return; }
 
     try {
-      const res = await fetch(`/tasks/${taskId}/approve`, {
+      const res  = await fetch(`/tasks/${taskId}/approve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ decision })
       });
       const data = await res.json();
-      if (!res.ok) { showResult('approveResult', 'Error: ' + (data.detail || res.status), '#f87171'); return; }
+      if (!res.ok) { showResult('approveResult', 'Error: ' + (data.detail || res.status), '#cc0000'); return; }
 
-      const color = decision === 'approve' ? '#4ade80' : '#f87171';
+      const color = decision === 'approve' ? '#2d8000' : '#cc0000';
       showResult('approveResult',
         `Decision: ${decision.toUpperCase()}\nFinal status: ${data.final_status}`,
         color
@@ -478,7 +559,7 @@
       setPipe('approve');
       toast(decision === 'approve' ? 'Dispute approved and sent!' : 'Dispute rejected.');
     } catch(e) {
-      showResult('approveResult', 'Network error: ' + e.message, '#f87171');
+      showResult('approveResult', 'Network error: ' + e.message, '#cc0000');
     }
   }
 </script>
