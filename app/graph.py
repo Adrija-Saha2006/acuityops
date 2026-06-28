@@ -146,6 +146,12 @@ def generate_dispute_node(state: AuditState) -> dict:
     if not state["violations"]:
         return {"dispute_letter": None, "status": "no_violations"}
 
+    rules_text = "\n".join([
+        f"- {r['metric_name']}: must be {r['operator']} {r['threshold']} {r['unit']}"
+        + (f", penalty: {r['penalty_amount']} {r['penalty_unit']}" if r.get("penalty_amount") else "")
+        for r in state["contract_rules"]
+    ])
+
     violations_text = "\n".join([
         f"- {v['metric_name']}: actual={v['actual']} {v['unit']}, "
         f"required={v['expected']}, deviation={v['breach_magnitude']} {v['unit']}, "
@@ -156,11 +162,17 @@ def generate_dispute_node(state: AuditState) -> dict:
 
     prompt = (
         "You are a legal-compliance assistant. "
-        "Draft a concise, professional contract dispute notice to a vendor based ONLY on "
-        "the violations listed below. "
-        "Do NOT invent company names, incident dates, regions, or root causes that are not "
-        "in the violations data. Keep it under 280 words. Be factual and formal.\n\n"
-        f"Violations:\n{violations_text}"
+        "You have been given a set of SLA rules extracted from a vendor contract "
+        "and the specific violations found during an audit. "
+        "Draft a concise, professional formal dispute notice addressed to the vendor.\n\n"
+        "Instructions:\n"
+        "- Infer the nature of the contract and vendor from the metric names and rules\n"
+        "- State each breach clearly: what was required, what was measured, the deviation\n"
+        "- Include the penalty or service credit for each breach\n"
+        "- Do NOT invent company names, dates, regions, or root causes not present in the data\n"
+        "- Keep it under 300 words, factual and formal\n\n"
+        f"SLA Rules from the contract:\n{rules_text}\n\n"
+        f"Violations found:\n{violations_text}"
     )
 
     try:
