@@ -884,6 +884,11 @@
       } else {
         setPipe('approve');
         showResult('auditResult', `Status: ${data.status}\nNo violations found — vendor is compliant.`, 'success');
+        // Lock step-approve back and clear any stale content from a previous run
+        document.getElementById('step-approve').classList.add('disabled');
+        document.getElementById('violationsList').innerHTML = '';
+        document.getElementById('disputeBox').innerHTML = '';
+        document.getElementById('approveResult').style.display = 'none';
       }
     } catch(e) {
       btn.textContent = '→ Run Audit'; btn.disabled = false;
