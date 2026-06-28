@@ -1,0 +1,11 @@
+SERVICE LEVEL AGREEMENT — ACME CLOUD SERVICES
+
+1. The Provider guarantees system uptime of at least 99.9% measured monthly.
+   Failure to meet this threshold incurs a penalty of $500 per hour of downtime
+   below the guarantee.
+
+2. Support tickets must receive a first response within 2 hours. Each late
+   response is penalized at $250 per incident.
+
+3. Physical hardware deliveries must complete within 48 hours of order
+   confirmation. Late deliveries are penalized $100 per hour.
