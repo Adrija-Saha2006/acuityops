@@ -1,0 +1,49 @@
+Amazon Compute Service Level Agreement
+Last Updated: May 25, 2022
+
+This Amazon Compute Service Level Agreement (this "SLA") is a policy governing the use of
+Amazon Elastic Compute Cloud ("Amazon EC2") and applies separately to each account using
+Amazon EC2.
+
+SLAs
+AWS makes two SLA commitments for Amazon EC2:
+(1) a Region-Level SLA that governs Amazon EC2 deployed across multiple AZs or regions, and
+(2) an Instance-Level SLA that governs Amazon EC2 instances individually.
+
+Region-Level SLA
+For Amazon EC2 with all running instances deployed concurrently across two or more AZs in
+the same region, AWS will use commercially reasonable efforts to make Amazon EC2 available
+for each AWS region with a Monthly Uptime Percentage of at least 99.99%, in each case
+during any monthly billing cycle (the "Region-Level SLA").
+
+Monthly Uptime Percentage              Service Credit Percentage
+Less than 99.99% but >= 99.0%          10%
+Less than 99.0%  but >= 95.0%          30%
+Less than 95.0%                        100%
+
+Instance-Level SLA
+For each individual Amazon EC2 instance ("Single EC2 Instance"), AWS will use commercially
+reasonable efforts to make the Single EC2 Instance available with an Instance-Level Uptime
+Percentage of at least 99.5%, in each case during any monthly billing cycle.
+
+Instance-Level Uptime Percentage       Service Credit Percentage
+Less than 99.5% but >= 99.0%           10%
+Less than 99.0% but >= 95.0%           30%
+Less than 95.0%                        100%
+
+SLA Credits
+Service Credits are calculated as a percentage of the monthly bill for Amazon EC2 in the
+affected AWS region that did not meet the Region-Level SLA, or for the Single EC2 Instance
+that did not meet the Instance-Level SLA, respectively.
+
+SLA Definitions
+"Monthly Uptime Percentage" is calculated by subtracting from 100% the percentage of
+minutes during the month in which Amazon EC2 was in the state of Unavailability.
+
+"Instance-Level Uptime Percentage" is calculated by subtracting from 100% the percentage
+of minutes during the month in which a Single EC2 Instance was in the state of Unavailability.
+
+"Unavailable" and "Unavailability" mean:
+- For the Instance-Level SLA: your Single EC2 Instance has no external connectivity.
+- For the Region-Level SLA: all running instances in two or more AZs concurrently have
+  no external connectivity.

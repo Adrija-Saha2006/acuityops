@@ -1,7 +1,17 @@
 from langchain_core.tools import tool
 
+# Simulates a vendor metrics API / internal monitoring DB.
+# During the July 30 2024 us-east-1 Kinesis incident, individual EC2 instances
+# also experienced connectivity loss for portions of the 7-hour window.
+# Instance-level uptime measured across the fleet: 99.2% (below the 99.5% SLA).
 _MOCK_VENDOR_DB = {
-    "delivery_time": {"metric": "delivery_time", "value": 60.0, "unit": "hours", "period": "2026-05"},
+    "instance_uptime": {
+        "metric": "instance_uptime",
+        "value": 99.2,
+        "unit": "percent",
+        "period": "2024-07",
+        "notes": "us-east-1 fleet average — Jul 30 2024 Kinesis incident",
+    },
 }
 
 

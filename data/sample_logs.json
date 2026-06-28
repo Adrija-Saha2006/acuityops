@@ -1,4 +1,9 @@
 [
-  { "metric": "uptime", "value": 99.2, "unit": "percent", "period": "2026-05" },
-  { "metric": "response_time", "value": 4.5, "unit": "hours", "period": "2026-05" }
+  {
+    "metric": "region_uptime",
+    "value": 99.06,
+    "unit": "percent",
+    "period": "2024-07",
+    "notes": "us-east-1 — 7h outage Jul 30 2024 (Kinesis failure). 44220/44640 minutes available."
+  }
 ]

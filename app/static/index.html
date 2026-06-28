@@ -202,8 +202,13 @@
     <p>Paste the vendor's operational metrics as JSON. Missing metrics are fetched automatically.</p>
     <label>Operational logs (JSON array)</label>
     <textarea id="logsInput">[
-  { "metric": "uptime", "value": 98.7, "unit": "percent", "period": "2026-05" },
-  { "metric": "response_time", "value": 5.2, "unit": "hours", "period": "2026-05" }
+  {
+    "metric": "region_uptime",
+    "value": 99.06,
+    "unit": "percent",
+    "period": "2024-07",
+    "notes": "us-east-1 — 7h outage Jul 30 2024 (Kinesis failure). 44220/44640 min available."
+  }
 ]</textarea>
     <button class="btn btn-primary" onclick="runAudit()">Run Audit</button>
     <div class="result" id="auditResult"></div>

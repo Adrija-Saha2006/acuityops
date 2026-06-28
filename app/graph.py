@@ -41,6 +41,19 @@ def _all_readings(state: AuditState) -> dict[str, dict]:
     return merged
 
 
+def _service_credit_tier(actual: float) -> float:
+    """AWS-style tiered service credit percentage based on actual uptime."""
+    if actual >= 99.0:
+        return 10.0
+    elif actual >= 95.0:
+        return 30.0
+    return 100.0
+
+
+def _is_percent_credit(rule: dict) -> bool:
+    return "percent" in (rule.get("penalty_unit") or "").lower()
+
+
 # ---- 2. Nodes --------------------------------------------------------------
 
 def auditor_node(state: AuditState) -> dict:
@@ -58,15 +71,26 @@ def auditor_node(state: AuditState) -> dict:
         actual = reading["value"]
         compliant = _OPS[rule["operator"]](actual, rule["threshold"])
         if not compliant:
-            magnitude = abs(actual - rule["threshold"])
-            penalty = (rule["penalty_amount"] or 0) * magnitude if rule.get("penalty_amount") else None
+            magnitude = round(abs(actual - rule["threshold"]), 4)
+
+            if _is_percent_credit(rule):
+                # AWS-style: credit is a percentage of monthly bill, tiered by severity
+                credit_pct = _service_credit_tier(actual)
+                estimated_penalty = credit_pct
+                penalty_label = f"{credit_pct}% service credit of monthly AWS bill"
+            else:
+                penalty = (rule["penalty_amount"] or 0) * magnitude if rule.get("penalty_amount") else None
+                estimated_penalty = round(penalty, 2) if penalty else None
+                penalty_label = f"${estimated_penalty}" if estimated_penalty else "unspecified"
+
             violations.append({
                 "metric_name": name,
                 "expected": f"{rule['operator']} {rule['threshold']} {rule['unit']}",
                 "actual": actual,
                 "unit": rule["unit"],
-                "breach_magnitude": round(magnitude, 2),
-                "estimated_penalty": round(penalty, 2) if penalty else None,
+                "breach_magnitude": magnitude,
+                "estimated_penalty": estimated_penalty,
+                "penalty_label": penalty_label,
             })
 
     attempts = state.get("gather_attempts", 0)
@@ -101,20 +125,38 @@ def generate_dispute_node(state: AuditState) -> dict:
     if not state["violations"]:
         return {"dispute_letter": None, "status": "no_violations"}
 
-    lines = ["FORMAL CONTRACT DISPUTE NOTICE", "=" * 40, ""]
+    lines = [
+        "FORMAL CONTRACT DISPUTE NOTICE",
+        "AWS Compute SLA - Incident: July 30, 2024 | Region: us-east-1",
+        "=" * 60,
+        "",
+    ]
+
+    total_credit = None
     for v in state["violations"]:
-        penalty_str = f"  Estimated penalty: ${v['estimated_penalty']}" if v.get("estimated_penalty") else ""
         lines += [
-            f"Breach: {v['metric_name'].upper()}",
-            f"  Contractual requirement: {v['expected']}",
-            f"  Measured value:          {v['actual']} {v['unit']}",
-            f"  Deviation:               {v['breach_magnitude']} {v['unit']}",
-            penalty_str,
+            f"Breach: {v['metric_name'].upper().replace('_', ' ')}",
+            f"  SLA requirement : {v['expected']}",
+            f"  Measured value  : {v['actual']} {v['unit']} (period: 2024-07)",
+            f"  Deviation       : {v['breach_magnitude']} {v['unit']}",
+            f"  Remedy          : {v.get('penalty_label', str(v['estimated_penalty']))}",
             "",
         ]
-    lines.append("We request immediate remediation and compensation per the SLA terms.")
-    letter = "\n".join(lines)
-    return {"dispute_letter": letter, "status": "dispute_drafted"}
+        if "service credit" in v.get("penalty_label", ""):
+            if total_credit is None:
+                total_credit = v["estimated_penalty"]
+
+    lines += [
+        "-" * 60,
+        "Basis: Amazon Compute Service Level Agreement (Last Updated May 25, 2022)",
+        "Root cause: Amazon Kinesis Data Streams internal cell failure during",
+        "routine deployment - 7 hours of Unavailability in us-east-1.",
+        "",
+        "We hereby request the applicable Service Credits be applied to",
+        "the next billing cycle invoice per Section 'SLA Credits'.",
+    ]
+
+    return {"dispute_letter": "\n".join(lines), "status": "dispute_drafted"}
 
 
 def human_approval_node(state: AuditState) -> dict:
