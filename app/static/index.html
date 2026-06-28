@@ -195,6 +195,42 @@
     <div class="result" id="uploadResult"></div>
   </div>
 
+  <!-- Log Generator -->
+  <div class="step disabled" id="step-generator">
+    <div class="step-badge" style="background:#8b5cf6">HELPER</div>
+    <h2>Log Generator</h2>
+    <p>Don't have a log file? Enter the incident details and we'll compute the uptime and write the JSON for you.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div>
+        <label>Metric name</label>
+        <select id="gen-metric" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;padding:10px 14px;font-size:0.85rem;outline:none">
+          <option value="region_uptime">region_uptime (AWS Region-Level)</option>
+          <option value="instance_uptime">instance_uptime (AWS Instance-Level)</option>
+          <option value="uptime">uptime (generic)</option>
+          <option value="custom">custom...</option>
+        </select>
+      </div>
+      <div>
+        <label>Custom metric name (if selected above)</label>
+        <input type="text" id="gen-custom-metric" placeholder="e.g. api_uptime" style="opacity:0.4" disabled />
+      </div>
+      <div>
+        <label>Month &amp; Year of incident</label>
+        <input type="month" id="gen-month" value="2024-07"
+               style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;padding:10px 14px;font-size:0.85rem;outline:none" />
+      </div>
+      <div>
+        <label>Total downtime (hours)</label>
+        <input type="number" id="gen-hours" value="7" min="0" step="0.5"
+               style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;padding:10px 14px;font-size:0.85rem;outline:none" />
+      </div>
+    </div>
+    <div id="gen-preview" style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px 16px;font-size:0.8rem;color:#94a3b8;margin-bottom:2px">
+      Fill in the fields above and click Generate.
+    </div>
+    <button class="btn" style="background:#8b5cf6;color:white;margin-top:10px" onclick="generateLog()">Generate Log JSON</button>
+  </div>
+
   <!-- Step 2: Audit -->
   <div class="step disabled" id="step-audit">
     <div class="step-badge">STEP 2</div>
@@ -255,6 +291,49 @@
     el.textContent = text;
   }
 
+  // Toggle custom metric input
+  document.getElementById('gen-metric').addEventListener('change', function() {
+    const custom = document.getElementById('gen-custom-metric');
+    if (this.value === 'custom') { custom.disabled = false; custom.style.opacity = '1'; }
+    else { custom.disabled = true; custom.style.opacity = '0.4'; }
+  });
+
+  function generateLog() {
+    const monthVal  = document.getElementById('gen-month').value;   // "2024-07"
+    const hours     = parseFloat(document.getElementById('gen-hours').value);
+    const metricSel = document.getElementById('gen-metric').value;
+    const metric    = metricSel === 'custom'
+                      ? document.getElementById('gen-custom-metric').value.trim()
+                      : metricSel;
+
+    if (!monthVal || isNaN(hours) || !metric) { toast('Fill in all fields'); return; }
+
+    // Calculate days in the selected month
+    const [year, month] = monthVal.split('-').map(Number);
+    const daysInMonth   = new Date(year, month, 0).getDate();
+    const totalMinutes  = daysInMonth * 24 * 60;
+    const downMinutes   = Math.round(hours * 60);
+    const uptimeMinutes = totalMinutes - downMinutes;
+    const uptimePct     = parseFloat(((uptimeMinutes / totalMinutes) * 100).toFixed(4));
+
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const label = `${monthNames[month-1]} ${year}`;
+
+    // Show calculation breakdown
+    document.getElementById('gen-preview').innerHTML =
+      `<span style="color:#4ade80">Calculation:</span><br>` +
+      `  ${daysInMonth} days in ${label} = <b>${totalMinutes.toLocaleString()} total minutes</b><br>` +
+      `  ${hours}h downtime = <b>${downMinutes} minutes unavailable</b><br>` +
+      `  Uptime = (${totalMinutes.toLocaleString()} - ${downMinutes}) / ${totalMinutes.toLocaleString()} x 100 = <b style="color:#fde047">${uptimePct}%</b>`;
+
+    // Build the JSON and push to Step 2
+    const log = [{ metric, value: uptimePct, unit: "percent", period: monthVal,
+                   notes: `${hours}h downtime in ${label} (${downMinutes}/${totalMinutes} min unavailable)` }];
+    document.getElementById('logsInput').value = JSON.stringify(log, null, 2);
+    document.getElementById('auditBtn').disabled = false;
+    toast(`Generated: ${metric} = ${uptimePct}% for ${label}`);
+  }
+
   function loadLogsFile(input) {
     const file = input.files[0];
     if (!file) return;
@@ -294,6 +373,7 @@
       });
       showResult('uploadResult', lines.join('\n'), '#4ade80');
 
+      document.getElementById('step-generator').classList.remove('disabled');
       document.getElementById('step-audit').classList.remove('disabled');
       setPipe('audit');
       toast('Contract parsed — ' + data.rules_extracted + ' rules found');
