@@ -1,3 +1,12 @@
+---
+title: AcuityOps
+emoji: 📄
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+---
+
 # AcuityOps — Autonomous Vendor Compliance Agent
 
 ## Problem
