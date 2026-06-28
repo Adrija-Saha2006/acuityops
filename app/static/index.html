@@ -433,6 +433,28 @@
       background: var(--gray-200);
     }
 
+    /* ── METRIC PREVIEW CARDS ── */
+    .metric-cards { display: flex; flex-wrap: wrap; gap: 10px; }
+    .metric-card {
+      background: var(--blue-light);
+      border: 1px solid rgba(0,71,255,0.15);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex; flex-direction: column; gap: 3px;
+      min-width: 180px;
+    }
+    .metric-card .mc-name {
+      font-size: 0.68rem; font-weight: 800;
+      color: var(--blue); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .metric-card .mc-value {
+      font-size: 1.3rem; font-weight: 900;
+      color: var(--black); letter-spacing: -0.5px; line-height: 1;
+    }
+    .metric-card .mc-meta {
+      font-size: 0.7rem; color: var(--gray-600); margin-top: 2px;
+    }
+
     /* ── TOAST ── */
     #toast {
       position: fixed; bottom: 28px; right: 28px;
@@ -612,7 +634,7 @@
   <div class="step disabled" id="step-audit">
     <div class="step-tag"><span class="step-tag-dot"></span>Step 02</div>
     <h2>Upload Vendor Logs</h2>
-    <p>Upload the vendor's operational log file (.json). Any missing metrics required by the contract are fetched automatically by the AI agent.</p>
+    <p>Upload the vendor's operational log file (.json), or use the Log Generator above. Missing metrics are fetched automatically by the agent.</p>
     <label>Vendor log file (.json)</label>
     <div class="upload-zone" id="zone-logs">
       <input type="file" id="logsFile" accept=".json" onchange="loadLogsFile(this)" />
@@ -620,8 +642,16 @@
       <div class="upload-text">Drop your log file here or click to browse</div>
       <div class="upload-hint">JSON format — or use the Log Generator above</div>
     </div>
-    <label style="margin-top:16px;">Loaded metrics — review before running</label>
-    <textarea id="logsInput" placeholder="Upload a .json log file above, or use the Log Generator..."></textarea>
+
+    <!-- Metric cards shown after load — replaces the raw textarea -->
+    <div id="metrics-preview" style="display:none; margin-top:18px;">
+      <label>Metrics ready to audit</label>
+      <div id="metrics-cards"></div>
+    </div>
+
+    <!-- Hidden data store — never shown -->
+    <textarea id="logsInput" style="display:none"></textarea>
+
     <button class="btn btn-primary" onclick="runAudit()" id="auditBtn" disabled>&#8594; Run Audit</button>
     <div class="result" id="auditResult"></div>
   </div>
@@ -725,9 +755,23 @@
 
     const log = [{ metric, value: uptimePct, unit: "percent", period: monthVal,
                    notes: `${hours}h downtime in ${label} (${downMinutes}/${totalMinutes} min unavailable)` }];
-    document.getElementById('logsInput').value = JSON.stringify(log, null, 2);
+    document.getElementById('logsInput').value = JSON.stringify(log);
+    showMetricCards(log);
     document.getElementById('auditBtn').disabled = false;
     toast(`Generated: ${metric} = ${uptimePct}% for ${label}`);
+  }
+
+  function showMetricCards(metrics) {
+    const preview = document.getElementById('metrics-preview');
+    const cards   = document.getElementById('metrics-cards');
+    preview.style.display = 'block';
+    cards.className = 'metric-cards';
+    cards.innerHTML = metrics.map(m => `
+      <div class="metric-card fade-in">
+        <div class="mc-name">${m.metric.replace(/_/g,' ')}</div>
+        <div class="mc-value">${m.value}<span style="font-size:0.9rem;font-weight:600;color:var(--gray-600)"> ${m.unit}</span></div>
+        <div class="mc-meta">${m.period || ''} ${m.notes ? '· ' + m.notes.split('(')[0].trim() : ''}</div>
+      </div>`).join('');
   }
 
   function loadLogsFile(input) {
@@ -739,7 +783,8 @@
     reader.onload = function(e) {
       try {
         const parsed = JSON.parse(e.target.result);
-        document.getElementById('logsInput').value = JSON.stringify(parsed, null, 2);
+        document.getElementById('logsInput').value = JSON.stringify(parsed);
+        showMetricCards(parsed);
         document.getElementById('auditBtn').disabled = false;
         toast(`Loaded ${parsed.length} metric(s) from ${file.name}`);
       } catch(err) {
