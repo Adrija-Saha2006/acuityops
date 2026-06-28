@@ -9,6 +9,8 @@ pinned: false
 
 # AcuityOps — Autonomous Vendor Compliance Agent
 
+**Live Demo:** https://adrijasaha2006-acuityops.hf.space
+
 ## Problem
 
 Companies lose thousands of dollars each month because vendor SLA violations go undetected.
