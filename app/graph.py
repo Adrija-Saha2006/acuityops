@@ -88,6 +88,7 @@ def auditor_node(state: AuditState) -> dict:
                 "expected": f"{rule['operator']} {rule['threshold']} {rule['unit']}",
                 "actual": actual,
                 "unit": rule["unit"],
+                "period": reading.get("period"),
                 "breach_magnitude": magnitude,
                 "estimated_penalty": estimated_penalty,
                 "penalty_label": penalty_label,
@@ -228,7 +229,7 @@ def build_graph():
         "generate_dispute": "generate_dispute",
     })
     b.add_edge("info_gatherer", "auditor")        # THE CYCLE
-    b.add_edge("generate_dispute", "human_approval")
+    b.add_conditional_edges("generate_dispute", lambda s: "human_approval" if s.get("dispute_letter") else END)
     b.add_edge("human_approval", END)
 
     return b.compile(checkpointer=InMemorySaver())
