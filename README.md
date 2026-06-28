@@ -66,7 +66,7 @@ or, with a persistent checkpointer, from a different process hours later.
 |-------|---------|
 | Agent orchestration | LangGraph 1.x |
 | LLM integration | LangChain 1.x + langchain-groq |
-| LLM | Llama 3.3 70B via Groq (free tier) |
+| LLM | Llama 3.3 70B via Groq (free tier, no billing required) |
 | API | FastAPI 0.115+ with async endpoints |
 | Frontend | Vanilla HTML/CSS/JS served via FastAPI static files |
 | Data validation | Pydantic v2 |
@@ -76,17 +76,18 @@ or, with a persistent checkpointer, from a different process hours later.
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/YOUR-USERNAME/acuityops.git
+git clone https://github.com/Adrija-Saha2006/acuityops.git
 cd acuityops
 
 # 2. Create virtual environment and install dependencies
 python -m venv .venv
-.venv\Scripts\activate        
+.venv\Scripts\activate        # Windows
+source .venv/bin/activate     # Mac / Linux
 pip install -r requirements.txt
 
-# 3. Add your API key to .env
+# 3. Add your Groq API key to .env (get one free at console.groq.com)
 # GROQ_API_KEY=gsk_...
-# USE_MOCK_LLM=false
+# Real LLM activates automatically when GROQ_API_KEY is set — no other config needed.
 
 # 4. Start the server
 uvicorn app.main:app --reload
@@ -128,10 +129,11 @@ Open **http://127.0.0.1:8000** in your browser. You will see the web UI.
 the setup to zero dependencies. For durability across server restarts I would swap in
 `AsyncSqliteSaver` from `langgraph-checkpoint-sqlite` — one line change in `build_graph()`.
 
-**Mock LLM extraction** — The Gemini integration is fully wired (`USE_MOCK_LLM=false`
-activates it). The mock exists because the free-tier project quota on Google AI Studio can
-be zero until billing is configured; it lets the rest of the system run and be evaluated
-without an active API key.
+**LLM provider** — Groq (Llama 3.3 70B) is the primary LLM. It activates automatically
+when `GROQ_API_KEY` is set in the environment — no other config needed. A hardcoded mock
+is available as a fallback when no API key is present, so the app starts and the pipeline
+can be inspected even without a key. Google Gemini 2.5 Flash is a secondary fallback if
+`GEMINI_API_KEY` is set instead.
 
 **Mock vendor tool** — `lookup_vendor_metric` queries a hardcoded dict. In production this
 would call a real vendor API or internal database. The tool interface (`@tool` decorator,

@@ -120,43 +120,62 @@ def info_gatherer_node(state: AuditState) -> dict:
     }
 
 
-def generate_dispute_node(state: AuditState) -> dict:
-    """Draft a formal dispute letter from the violations."""
-    if not state["violations"]:
-        return {"dispute_letter": None, "status": "no_violations"}
-
-    lines = [
-        "FORMAL CONTRACT DISPUTE NOTICE",
-        "AWS Compute SLA - Incident: July 30, 2024 | Region: us-east-1",
-        "=" * 60,
-        "",
-    ]
-
-    total_credit = None
-    for v in state["violations"]:
+def _fallback_letter(violations: list[dict]) -> str:
+    """Plain-text letter built purely from violation data — no hardcoded vendor strings."""
+    lines = ["FORMAL CONTRACT DISPUTE NOTICE", "=" * 52, ""]
+    for v in violations:
         lines += [
             f"Breach: {v['metric_name'].upper().replace('_', ' ')}",
             f"  SLA requirement : {v['expected']}",
-            f"  Measured value  : {v['actual']} {v['unit']} (period: 2024-07)",
+            f"  Measured value  : {v['actual']} {v['unit']}"
+            + (f"  (period: {v.get('period', '')})" if v.get("period") else ""),
             f"  Deviation       : {v['breach_magnitude']} {v['unit']}",
             f"  Remedy          : {v.get('penalty_label', str(v['estimated_penalty']))}",
             "",
         ]
-        if "service credit" in v.get("penalty_label", ""):
-            if total_credit is None:
-                total_credit = v["estimated_penalty"]
-
     lines += [
-        "-" * 60,
-        "Basis: Amazon Compute Service Level Agreement (Last Updated May 25, 2022)",
-        "Root cause: Amazon Kinesis Data Streams internal cell failure during",
-        "routine deployment - 7 hours of Unavailability in us-east-1.",
-        "",
-        "We hereby request the applicable Service Credits be applied to",
-        "the next billing cycle invoice per Section 'SLA Credits'.",
+        "-" * 52,
+        "We hereby request immediate remediation and the applicable",
+        "penalties / service credits per the terms of the SLA.",
     ]
+    return "\n".join(lines)
 
-    return {"dispute_letter": "\n".join(lines), "status": "dispute_drafted"}
+
+def generate_dispute_node(state: AuditState) -> dict:
+    """Draft a formal dispute letter using the LLM so it fits any contract."""
+    if not state["violations"]:
+        return {"dispute_letter": None, "status": "no_violations"}
+
+    violations_text = "\n".join([
+        f"- {v['metric_name']}: actual={v['actual']} {v['unit']}, "
+        f"required={v['expected']}, deviation={v['breach_magnitude']} {v['unit']}, "
+        f"remedy={v.get('penalty_label', str(v['estimated_penalty']))}"
+        + (f", period={v['period']}" if v.get("period") else "")
+        for v in state["violations"]
+    ])
+
+    prompt = (
+        "You are a legal-compliance assistant. "
+        "Draft a concise, professional contract dispute notice to a vendor based ONLY on "
+        "the violations listed below. "
+        "Do NOT invent company names, incident dates, regions, or root causes that are not "
+        "in the violations data. Keep it under 280 words. Be factual and formal.\n\n"
+        f"Violations:\n{violations_text}"
+    )
+
+    try:
+        import os
+        from langchain_groq import ChatGroq
+        llm = ChatGroq(
+            model="llama-3.3-70b-versatile",
+            temperature=0.2,
+            api_key=os.environ["GROQ_API_KEY"],
+        )
+        letter = llm.invoke(prompt).content
+    except Exception:
+        letter = _fallback_letter(state["violations"])
+
+    return {"dispute_letter": letter, "status": "dispute_drafted"}
 
 
 def human_approval_node(state: AuditState) -> dict:

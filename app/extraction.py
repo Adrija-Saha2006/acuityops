@@ -4,8 +4,12 @@ from app.models import ContractRules
 
 load_dotenv()
 
-# Set USE_MOCK_LLM=false in .env to switch to the real Gemini LLM.
-_USE_MOCK = os.getenv("USE_MOCK_LLM", "true").lower() != "false"
+# Auto-use real LLM if GROQ_API_KEY is present, unless explicitly overridden.
+_explicit = os.getenv("USE_MOCK_LLM")
+if _explicit is not None:
+    _USE_MOCK = _explicit.lower() != "false"
+else:
+    _USE_MOCK = not bool(os.getenv("GROQ_API_KEY"))
 
 _EXTRACTION_PROMPT = """You extract enforceable obligations from service contracts.
 
@@ -68,7 +72,7 @@ def _real_extract(contract_text: str) -> list[dict]:
     else:
         from langchain_google_genai import ChatGoogleGenerativeAI
         llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             temperature=0,
             google_api_key=os.environ["GEMINI_API_KEY"],
         )
