@@ -1,11 +1,4 @@
----
-title: AcuityOps
-emoji: 📄
-colorFrom: blue
-colorTo: green
-sdk: docker
-pinned: false
----
+
 
 # AcuityOps — Autonomous Vendor Compliance Agent
 
@@ -88,7 +81,7 @@ cd acuityops
 
 # 2. Create virtual environment and install dependencies
 python -m venv .venv
-.venv\Scripts\activate        # Windows
+.venv\Scripts\activate        
 pip install -r requirements.txt
 
 # 3. Add your API key to .env
