@@ -61,7 +61,11 @@ async def upload_contract(file: UploadFile = File(...)):
     if not text.strip():
         raise HTTPException(status_code=400, detail="Contract file is empty or unreadable.")
 
-    rules = extract_rules(text)
+    try:
+        rules = extract_rules(text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"LLM extraction failed: {e}")
+
     if not rules:
         raise HTTPException(status_code=422, detail="No enforceable rules found in contract.")
 
