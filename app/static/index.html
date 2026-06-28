@@ -198,19 +198,13 @@
   <!-- Step 2: Audit -->
   <div class="step disabled" id="step-audit">
     <div class="step-badge">STEP 2</div>
-    <h2>Submit Vendor Logs</h2>
-    <p>Paste the vendor's operational metrics as JSON. Missing metrics are fetched automatically.</p>
-    <label>Operational logs (JSON array)</label>
-    <textarea id="logsInput">[
-  {
-    "metric": "region_uptime",
-    "value": 99.06,
-    "unit": "percent",
-    "period": "2024-07",
-    "notes": "us-east-1 — 7h outage Jul 30 2024 (Kinesis failure). 44220/44640 min available."
-  }
-]</textarea>
-    <button class="btn btn-primary" onclick="runAudit()">Run Audit</button>
+    <h2>Upload Vendor Logs</h2>
+    <p>Upload the vendor's operational log file (.json). Missing metrics are fetched automatically by the agent.</p>
+    <label>Vendor log file (.json)</label>
+    <input type="file" id="logsFile" accept=".json" onchange="loadLogsFile(this)" />
+    <label style="margin-top:14px;">Loaded metrics — review before running</label>
+    <textarea id="logsInput" placeholder="Upload a .json log file above to populate this field..."></textarea>
+    <button class="btn btn-primary" onclick="runAudit()" id="auditBtn" disabled>Run Audit</button>
     <div class="result" id="auditResult"></div>
   </div>
 
@@ -259,6 +253,25 @@
     el.style.display = 'block';
     el.style.color = color || '#94a3b8';
     el.textContent = text;
+  }
+
+  function loadLogsFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (!file.name.endsWith('.json')) { toast('Please upload a .json file'); return; }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        document.getElementById('logsInput').value = JSON.stringify(parsed, null, 2);
+        document.getElementById('auditBtn').disabled = false;
+        toast(`Loaded ${parsed.length} metric(s) from ${file.name}`);
+      } catch(err) {
+        toast('Invalid JSON in log file: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
   }
 
   async function uploadContract() {
