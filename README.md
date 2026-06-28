@@ -137,8 +137,9 @@ the setup to zero dependencies. For durability across server restarts I would sw
 `AsyncSqliteSaver` from `langgraph-checkpoint-sqlite` — one line change in `build_graph()`.
 
 **LLM provider** — Groq (Llama 3.3 70B) is the primary LLM. It activates automatically
-when `GROQ_API_KEY` is set in the environment. Google Gemini 2.5 Flash is a secondary
-fallback if `GEMINI_API_KEY` is set instead.
+when `GROQ_API_KEY` is set. Google Gemini 2.5 Flash is a secondary fallback if
+`GEMINI_API_KEY` is set. If neither key is present, the API returns a clear 503 error
+prompting the user to configure a key — no silent wrong output.
 
 **General-purpose extraction** — the extraction prompt includes examples for cloud, telecom,
 delivery, support, and SaaS contracts. The LLM infers the contract type from its content
