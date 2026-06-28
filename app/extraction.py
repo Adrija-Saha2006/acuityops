@@ -66,6 +66,53 @@ Clause: "Critical issues must be resolved within 4 hours of being reported."
 """
 
 
+_JSON_SUFFIX = """
+
+Respond with a valid JSON array only. No explanation, no markdown fences.
+Each operator must be exactly one of: >= <= > < ==
+
+[
+  {
+    "metric_name": "example_metric",
+    "operator": ">=",
+    "threshold": 99.9,
+    "unit": "percent",
+    "penalty_amount": 500,
+    "penalty_unit": "per_hour"
+  }
+]"""
+
+_VALID_OPS = {">=", "<=", ">", "<", "=="}
+
+
+def _parse_llm_json(text: str) -> list[dict]:
+    """Parse and validate LLM JSON output, cleaning up common model formatting artifacts."""
+    import json, re
+    from app.models import ContractRule
+
+    match = re.search(r'\[[\s\S]*\]', text)
+    if not match:
+        return []
+    try:
+        raw = json.loads(match.group())
+    except json.JSONDecodeError:
+        return []
+
+    result = []
+    for item in raw:
+        # Normalise operator — strip any quotes/commas the model may have included
+        op = str(item.get("operator", ""))
+        cleaned = next((v for v in [">=", "<=", "==", ">", "<"] if v in op), None)
+        if not cleaned:
+            continue
+        item["operator"] = cleaned
+        try:
+            result.append(ContractRule(**item).model_dump())
+        except Exception:
+            pass
+    return result
+
+
 def _real_extract(contract_text: str) -> list[dict]:
     groq_key = os.getenv("GROQ_API_KEY")
     if groq_key:
@@ -78,14 +125,13 @@ def _real_extract(contract_text: str) -> list[dict]:
             temperature=0,
             google_api_key=os.environ["GEMINI_API_KEY"],
         )
-    structured_llm = llm.with_structured_output(ContractRules)
-    result: ContractRules = structured_llm.invoke(
-        [
-            {"role": "system", "content": _EXTRACTION_PROMPT},
-            {"role": "user", "content": f"Contract text:\n\n{contract_text}"},
-        ]
-    )
-    return [r.model_dump() for r in result.rules]
+
+    # Use plain JSON output instead of tool-calling to avoid strict schema validation
+    response = llm.invoke([
+        {"role": "system", "content": _EXTRACTION_PROMPT + _JSON_SUFFIX},
+        {"role": "user",   "content": f"Contract text:\n\n{contract_text}"},
+    ])
+    return _parse_llm_json(response.content)
 
 
 def _deduplicate_rules(rules: list[dict]) -> list[dict]:
