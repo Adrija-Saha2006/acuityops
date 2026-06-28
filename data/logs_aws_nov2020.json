@@ -1,0 +1,16 @@
+[
+  {
+    "metric": "region_uptime",
+    "value": 99.0278,
+    "unit": "percent",
+    "period": "2020-11",
+    "notes": "AWS us-east-1 — Nov 25 2020. Kinesis Data Streams disruption cascaded into Lambda, Cognito, CloudWatch. 7h downtime. 42780/43200 min available."
+  },
+  {
+    "metric": "instance_uptime",
+    "value": 99.4444,
+    "unit": "percent",
+    "period": "2020-11",
+    "notes": "EC2 instances experienced partial connectivity loss for ~4h. 42960/43200 min available. Below 99.5% SLA threshold."
+  }
+]

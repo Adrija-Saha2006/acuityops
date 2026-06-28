@@ -1,0 +1,16 @@
+[
+  {
+    "metric": "region_uptime",
+    "value": 99.375,
+    "unit": "percent",
+    "period": "2019-06",
+    "notes": "Google Cloud us-east — Jun 2 2019. Misconfigured network policy pushed globally caused packet loss across all regions. 4.5h downtime. 42930/43200 min available."
+  },
+  {
+    "metric": "instance_uptime",
+    "value": 99.444,
+    "unit": "percent",
+    "period": "2019-06",
+    "notes": "Compute Engine VMs experienced degraded network throughput for ~4h. 42960/43200 min available."
+  }
+]

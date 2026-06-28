@@ -1,0 +1,23 @@
+[
+  {
+    "metric": "uptime",
+    "value": 99.97,
+    "unit": "percent",
+    "period": "2026-04",
+    "notes": "ACME Cloud — Apr 2026. Only 13 min of scheduled maintenance window. Well above 99.9% SLA."
+  },
+  {
+    "metric": "response_time",
+    "value": 1.2,
+    "unit": "hours",
+    "period": "2026-04",
+    "notes": "Average first-response time to support tickets was 1.2h — within the 2h SLA commitment."
+  },
+  {
+    "metric": "delivery_time",
+    "value": 36,
+    "unit": "hours",
+    "period": "2026-04",
+    "notes": "All hardware deliveries completed within 36h — within the 48h SLA commitment."
+  }
+]

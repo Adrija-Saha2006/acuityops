@@ -1,0 +1,16 @@
+[
+  {
+    "metric": "uptime",
+    "value": 98.6,
+    "unit": "percent",
+    "period": "2026-05",
+    "notes": "ACME Cloud — May 2026. Production environment unavailable for ~19h due to database cluster failover failure. 43416/44160 min available. Well below 99.9% SLA."
+  },
+  {
+    "metric": "response_time",
+    "value": 5.8,
+    "unit": "hours",
+    "period": "2026-05",
+    "notes": "Average first-response time to support tickets was 5.8h in May 2026 — nearly 3x the 2h SLA commitment."
+  }
+]

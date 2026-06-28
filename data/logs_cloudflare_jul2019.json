@@ -1,0 +1,9 @@
+[
+  {
+    "metric": "region_uptime",
+    "value": 99.9395,
+    "unit": "percent",
+    "period": "2019-07",
+    "notes": "Cloudflare global — Jul 2 2019. Faulty WAF regex rule consumed 100% CPU across all PoPs globally. 27 min downtime. 44613/44640 min available. Small outage but below 100% SLA guarantee."
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "metric": "region_uptime",
+    "value": 98.9247,
+    "unit": "percent",
+    "period": "2021-12",
+    "notes": "AWS us-east-1 — Dec 7 2021. Major networking and power disruption at primary data centre. 8h downtime. 44160/44640 min available. Triggered 30% credit tier."
+  },
+  {
+    "metric": "instance_uptime",
+    "value": 99.1935,
+    "unit": "percent",
+    "period": "2021-12",
+    "notes": "Individual EC2 instances lost connectivity for ~6h during the same incident. 44280/44640 min available."
+  }
+]
